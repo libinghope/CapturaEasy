@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using Captura.Loc;
-using Captura.Models;
 
 namespace Captura.Fakes
 {

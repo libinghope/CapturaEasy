@@ -1,5 +1,3 @@
-﻿using Captura.Models;
-
 namespace Captura
 {
     public static class FrameExtensions

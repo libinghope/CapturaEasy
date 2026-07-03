@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
+using Captura.Bootstrap;
 using Captura.Loc;
 using Captura.Models;
 using Captura.MouseKeyHook;
@@ -51,13 +52,10 @@ namespace Captura
             ServiceProvider.LoadModule(new CoreModule());
             ServiceProvider.LoadModule(new ViewCoreModule());
 
-            // --v2 不走 CommandLineParser（避免未知参数导致 WithParsed 不触发、CmdOptions 为 null）
-            bool launchV2 = Args.Args.Any(a => string.Equals(a, "--v2", StringComparison.OrdinalIgnoreCase));
-
+            // 命令行解析失败（如遇未知参数）时 WithParsed 不触发，这里兜底默认实例防止 CmdOptions 为 null
             Parser.Default.ParseArguments<CmdOptions>(Args.Args)
                 .WithParsed(M => CmdOptions = M);
 
-            // 兜底默认实例，防止解析失败时 CmdOptions 为 null
             if (CmdOptions == null)
                 CmdOptions = new CmdOptions();
 
@@ -74,16 +72,8 @@ namespace Captura
 
             BindKeymapSetting(settings);
 
-            // 决定启动哪个主窗口：--v2 进原型，否则进原版
-            // App.xaml 不设 StartupUri，完全由此处控制
-            if (launchV2)
-            {
-                MainWindow = new Prototype.MainWindowV2();
-            }
-            else
-            {
-                MainWindow = new MainWindow();
-            }
+            // App.xaml 不设 StartupUri，由此处统一构造主窗口
+            MainWindow = new MainWindow();
             MainWindow.Show();
         }
 
@@ -140,16 +130,17 @@ namespace Captura
                 Settings.Load();
             }
 
-            if (Settings.UI.DarkTheme)
+            // 默认已是暗色（App.xaml 的 BundledTheme BaseTheme="Dark"）
+            if (!Settings.UI.DarkTheme)
             {
-                AppearanceManager.Current.ThemeSource = AppearanceManager.DarkThemeSource;
+                ThemeService.ApplyTheme(false);
             }
 
             var accent = Settings.UI.AccentColor;
 
             if (!string.IsNullOrEmpty(accent))
             {
-                AppearanceManager.Current.AccentColor = WpfExtensions.ParseColor(accent);
+                ThemeService.ApplyAccent(WpfExtensions.ParseColor(accent));
             }
         }
     }

@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Windows;
+using Captura.Models;
 using Captura.Views;
 
-namespace Captura.Models
+namespace Captura.Bootstrap
 {
     class MainWindowProvider : IMainWindow
     {

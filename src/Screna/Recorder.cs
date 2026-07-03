@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Captura.Audio;
-using Captura.Models;
 
 // ReSharper disable MethodSupportsCancellation
 

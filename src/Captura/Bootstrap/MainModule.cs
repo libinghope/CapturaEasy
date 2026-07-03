@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using Captura.Audio;
 using Captura.FFmpeg;
 using Captura.Hotkeys;
+using Captura.Bootstrap;
 using Captura.Models;
 using Captura.Video;
 using Captura.ViewModels;

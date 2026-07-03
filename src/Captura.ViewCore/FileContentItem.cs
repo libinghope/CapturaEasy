@@ -1,6 +1,6 @@
-﻿using System.IO;
+using System.IO;
 
-namespace Captura.Models
+namespace Captura.ViewModels
 {
     public class FileContentItem
     {

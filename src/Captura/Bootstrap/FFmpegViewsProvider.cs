@@ -1,9 +1,7 @@
-﻿using System.Windows;
+using System.Windows;
 using Captura.Audio;
 using Captura.Loc;
-using Captura.Models;
 using Captura.Views;
-using FirstFloor.ModernUI.Windows.Controls;
 
 namespace Captura.FFmpeg
 {
@@ -35,27 +33,20 @@ namespace Captura.FFmpeg
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                var dialog = new ModernDialog
-                {
-                    Title = "FFmpeg Unavailable",
-                    Content = "FFmpeg was not found on your system.\n\nSelect FFmpeg Folder if you alrady have FFmpeg on your system, else Download FFmpeg."
-                };
-
-                // Yes -> Select FFmpeg Folder
-                dialog.YesButton.Content = _loc.SelectFFmpegFolder;
-                dialog.YesButton.Click += (S, E) => PickFolder();
-
-                // No -> Download FFmpeg
-                dialog.NoButton.Content = _loc.DownloadFFmpeg;
-                dialog.NoButton.Click += (S, E) => ShowDownloader();
-
-                dialog.CancelButton.Content = "Cancel";
-
-                dialog.Buttons = new[] { dialog.YesButton, dialog.NoButton, dialog.CancelButton };
-
                 _audioPlayer.Play(SoundKind.Error);
 
-                dialog.ShowDialog();
+                var message = "FFmpeg was not found on your system.\n\n" +
+                              $"Yes = {_loc.SelectFFmpegFolder}\n" +
+                              $"No  = {_loc.DownloadFFmpeg}\n" +
+                              "Cancel = Dismiss";
+
+                var result = MessageBox.Show(message, "FFmpeg Unavailable",
+                    MessageBoxButton.YesNoCancel, MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                    PickFolder();
+                else if (result == MessageBoxResult.No)
+                    ShowDownloader();
             });
         }
 

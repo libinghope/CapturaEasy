@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Captura.Models;
 
-namespace Captura.Models
+namespace Captura.Bootstrap
 {
     public static class SingleInstanceManager
     {

@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Input;
 using Captura.Audio;
 using Captura.FFmpeg;
@@ -142,6 +143,44 @@ namespace Captura.ViewModels
             {
                 _syncContext.Run(async () => await StopRecording(), true);
             };
+
+            // 定时录制：每 5 秒检查 StartAtTime，到点且未录制时自动开始
+            _scheduledStartTimer = new Timer(5000);
+            _scheduledStartTimer.Elapsed += CheckScheduledStart;
+            _scheduledStartTimer.Start();
+        }
+
+        readonly Timer _scheduledStartTimer;
+        bool _scheduledFired;
+
+        void CheckScheduledStart(object sender, ElapsedEventArgs e)
+        {
+            var startAt = Settings.StartAtTime;
+
+            if (string.IsNullOrWhiteSpace(startAt))
+            {
+                _scheduledFired = false;
+                return;
+            }
+
+            if (_scheduledFired)
+                return;
+
+            if (RecorderState.Value != Models.RecorderState.NotRecording)
+                return;
+
+            if (!TimeSpan.TryParse(startAt, out var target))
+                return;
+
+            var now = DateTime.Now.TimeOfDay;
+
+            // 到点（允许 ±10 秒误差）
+            if (now >= target && (now - target).TotalMinutes < 1)
+            {
+                _scheduledFired = true;
+
+                _syncContext.Run(() => RecordCommand.ExecuteIfCan(), false);
+            }
         }
 
         async void OnRecordExecute()

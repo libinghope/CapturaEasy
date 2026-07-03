@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
@@ -127,6 +127,16 @@ namespace Captura
         public int Duration
         {
             get => Get(0);
+            set => Set(value);
+        }
+
+        /// <summary>
+        /// 定时录制的开始时间（24小时制 HH:mm，如 "09:30"）。
+        /// 设为空或 null 表示不启用定时录制。
+        /// </summary>
+        public string StartAtTime
+        {
+            get => Get<string>();
             set => Set(value);
         }
 

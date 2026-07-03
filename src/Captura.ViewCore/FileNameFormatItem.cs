@@ -1,4 +1,4 @@
-﻿namespace Captura.Models
+namespace Captura.ViewModels
 {
     public class FileNameFormatItem
     {

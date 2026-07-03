@@ -1,11 +1,12 @@
-﻿using System;
+using System;
 using System.Management;
 using System.Text;
 using Captura.Audio;
+using Captura.Models;
 using Captura.ViewModels;
 using Captura.Webcam;
 
-namespace Captura.Models
+namespace Captura.Bootstrap
 {
     public static class SystemInfo
     {

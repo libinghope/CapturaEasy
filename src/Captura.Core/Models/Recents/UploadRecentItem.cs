@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Input;
@@ -60,6 +60,8 @@ namespace Captura.Models
         public string IconColor => "MediumPurple";
 
         bool IRecentItem.IsSaving => false;
+
+        public string ThumbnailPath => null;
 
         public ICommand ClickCommand { get; }
 

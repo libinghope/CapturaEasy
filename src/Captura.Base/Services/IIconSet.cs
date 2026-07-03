@@ -1,4 +1,4 @@
-﻿// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Global
 namespace Captura
 {
     public interface IIconSet
@@ -62,6 +62,12 @@ namespace Captura
         string Game { get; }
 
         string GitHub { get; }
+
+        // GIF 图标
+        string Gif { get; }
+
+        // 压缩图标
+        string Compress { get; }
 
         string Hand { get; }
 

@@ -1,4 +1,4 @@
-﻿using Captura.Models;
+using Captura.Models;
 using Captura.Audio;
 using Captura.FFmpeg;
 using Captura.Hotkeys;
@@ -36,6 +36,9 @@ namespace Captura
             Binder.Bind<IRecentList, RecentListRepository>();
             Binder.Bind<IRecentItemSerializer, FileRecentSerializer>();
             Binder.Bind<IRecentItemSerializer, UploadRecentSerializer>();
+
+            // Scenes（录制场景/预设）
+            Binder.BindSingleton<SceneRepository>();
 
             Binder.Bind<IImageUploader, ImgurUploader>();
             Binder.Bind<IIconSet, MaterialDesignIcons>();

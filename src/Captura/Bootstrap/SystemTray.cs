@@ -1,9 +1,10 @@
-﻿using Hardcodet.Wpf.TaskbarNotification;
+using Hardcodet.Wpf.TaskbarNotification;
 using System;
 using System.Windows.Controls.Primitives;
 using Captura.Audio;
+using Captura.Models;
 
-namespace Captura.Models
+namespace Captura.Bootstrap
 {
     // ReSharper disable once ClassNeverInstantiated.Global
     class SystemTray : ISystemTray, IDisposable

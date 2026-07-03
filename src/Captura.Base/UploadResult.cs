@@ -1,4 +1,4 @@
-﻿namespace Captura.Models
+namespace Captura
 {
     public class UploadResult
     {

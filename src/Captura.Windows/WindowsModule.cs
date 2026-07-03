@@ -1,5 +1,4 @@
-﻿using Captura.Audio;
-using Captura.Models;
+using Captura.Audio;
 using System;
 using Captura.Video;
 using Captura.Webcam;

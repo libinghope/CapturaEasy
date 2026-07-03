@@ -1,5 +1,4 @@
-﻿using System;
-using Captura.Models;
+using System;
 
 namespace Captura.Video
 {

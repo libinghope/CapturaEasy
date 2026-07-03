@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Captura.Video;
 using Captura.ViewModels;
 using Captura.Webcam;
 
-namespace Captura.Models
+namespace Captura.ViewModels
 {
     // ReSharper disable once ClassNeverInstantiated.Global
     public class RememberByName

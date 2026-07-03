@@ -1,5 +1,3 @@
-﻿using Captura.Models;
-
 namespace Captura.Fakes
 {
     // ReSharper disable once ClassNeverInstantiated.Global

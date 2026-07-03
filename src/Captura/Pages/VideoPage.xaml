@@ -1,7 +1,8 @@
-﻿<Page x:Class="Captura.VideoPage"
+<Page x:Class="Captura.VideoPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+      xmlns:video="clr-namespace:Captura.Video;assembly=Captura.Base"
       Title="{Binding Video, Source={StaticResource Loc}, Mode=OneWay}"
       DataContext="{Binding MainViewModel, Source={StaticResource ServiceLocator}}">
     <Grid Margin="5">
@@ -123,6 +124,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition/>
                     <RowDefinition/>
+                    <RowDefinition/>
                 </Grid.RowDefinitions>
 
                 <Label Content="{Binding PreStartCountdown, Source={StaticResource Loc}, Mode=OneWay}"
@@ -143,6 +145,17 @@
                                     Grid.Column="1"
                                     Margin="0,2"
                                     ToolTip="No of seconds after which recording is stopped automatically. 0 = don't stop automatically"/>
+
+                <Label Content="定时开始"
+                       ContentStringFormat="{}{0}: "
+                       Margin="0,2,10,2"
+                       Grid.Row="2"
+                       ToolTip="到指定时间自动开始录制（24小时制 HH:mm，留空=不启用）"/>
+                <TextBox Text="{Binding Settings.StartAtTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         Grid.Row="2"
+                         Grid.Column="1"
+                         Margin="0,2"
+                         ToolTip="24小时制 HH:mm，如 09:30。留空=不启用"/>
             </Grid>
 
             <CheckBox IsChecked="{Binding Settings.CopyOutPathToClipboard}"
@@ -298,23 +311,43 @@
                 </ComboBox>
             </DockPanel>
 
-            <DockPanel Margin="0,5"
-                       IsEnabled="{Binding ViewConditions.IsEnabled.Value, Source={StaticResource ServiceLocator}}"
-                       Visibility="{Binding ViewConditions.IsVideoQuality.Value, Source={StaticResource ServiceLocator}, Converter={StaticResource BoolToVisibilityConverter}}">
+            <StackPanel Margin="0,5"
+                        IsEnabled="{Binding ViewConditions.IsEnabled.Value, Source={StaticResource ServiceLocator}}"
+                        Visibility="{Binding ViewConditions.IsVideoQuality.Value, Source={StaticResource ServiceLocator}, Converter={StaticResource BoolToVisibilityConverter}}">
+
+                <!-- 画质档位：流畅 / 高清 / 原画 / 自定义 -->
                 <Label Content="{Binding Quality, Source={StaticResource Loc}, Mode=OneWay}"
-                       ContentStringFormat="{}{0}:"/>
-                <Label Content="{Binding Settings.Video.Quality}"
-                       ContentStringFormat="{}{0:N0}%"
-                       Margin="5,0"
-                       MinWidth="30"
-                       HorizontalContentAlignment="Right"/>
-                <Slider Minimum="1" 
-                        Maximum="100"
-                        SelectionStart="60"
-                        SelectionEnd="80"
-                        IsSelectionRangeEnabled="True"
-                        Value="{Binding Settings.Video.Quality}"/>
-            </DockPanel>
+                       ContentStringFormat="{}{0}:"
+                       Margin="0,0,0,3"/>
+                <WrapPanel Margin="0,0,0,8">
+                    <RadioButton Content="流畅"
+                                 Margin="0,0,12,0"
+                                 IsChecked="{Binding Settings.Video.QualityPreset, Converter={StaticResource EnumMatchConverter}, ConverterParameter={x:Static video:VideoQualityPreset.Smooth}, Mode=TwoWay}"/>
+                    <RadioButton Content="高清"
+                                 Margin="0,0,12,0"
+                                 IsChecked="{Binding Settings.Video.QualityPreset, Converter={StaticResource EnumMatchConverter}, ConverterParameter={x:Static video:VideoQualityPreset.HD}, Mode=TwoWay}"/>
+                    <RadioButton Content="原画"
+                                 Margin="0,0,12,0"
+                                 IsChecked="{Binding Settings.Video.QualityPreset, Converter={StaticResource EnumMatchConverter}, ConverterParameter={x:Static video:VideoQualityPreset.Original}, Mode=TwoWay}"/>
+                    <RadioButton Content="自定义"
+                                 IsChecked="{Binding Settings.Video.QualityPreset, Converter={StaticResource EnumMatchConverter}, ConverterParameter={x:Static video:VideoQualityPreset.Custom}, Mode=TwoWay}"/>
+                </WrapPanel>
+
+                <!-- 自定义档位下才显示 slider -->
+                <DockPanel Visibility="{Binding Settings.Video.QualityPreset, Converter={StaticResource EnumMatchConverter}, ConverterParameter={x:Static video:VideoQualityPreset.Custom}, Mode=OneWay}">
+                    <Label Content="{Binding Settings.Video.Quality}"
+                           ContentStringFormat="{}{0:N0}%"
+                           Margin="5,0"
+                           MinWidth="30"
+                           HorizontalContentAlignment="Right"/>
+                    <Slider Minimum="1"
+                            Maximum="100"
+                            SelectionStart="60"
+                            SelectionEnd="80"
+                            IsSelectionRangeEnabled="True"
+                            Value="{Binding Settings.Video.Quality}"/>
+                </DockPanel>
+            </StackPanel>
 
             <CheckBox Margin="0,15,0,5"
                       Content="Convert after encoding"

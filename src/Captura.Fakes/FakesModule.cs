@@ -1,6 +1,5 @@
-﻿using Captura.Audio;
+using Captura.Audio;
 using Captura.FFmpeg;
-using Captura.Models;
 using Captura.Video;
 
 namespace Captura.Fakes

@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 
-namespace Captura.Models
+namespace Captura
 {
     public interface IRecentList : IDisposable
     {

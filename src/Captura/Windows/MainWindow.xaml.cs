@@ -1,22 +1,38 @@
-﻿using System.Drawing;
+using System;
+using System.Drawing;
 using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
+using Captura.Bootstrap;
 using Captura.Models;
+using Captura.Prototype;
+using Captura.ViewModels;
 
 namespace Captura
 {
+    /// <summary>
+    /// CapturaEasy 主窗口（A3 转正版）。
+    /// 合并自：
+    ///   - 原 V1 MainWindow：单例 / 初始化 / 退出流程 / 单实例唤醒 / 托盘交互 / 预览宿主
+    ///   - V2 卡片化原型：顶栏拖拽 / 场景保存 / 截图下拉 / 最近列表 / HUD 自动弹出
+    /// 注意：保留 x:Class="Captura.MainWindow" 与 public static Instance，
+    ///       PreviewWindowService 等 7 处对 MainWindow.Instance 的引用零修改。
+    /// </summary>
     public partial class MainWindow
     {
         public static MainWindow Instance { get; private set; }
 
         readonly MainWindowHelper _helper;
 
+        // 录制中悬浮球（HUD）：Recording/Paused 时自动弹出，NotRecording 时关闭
+        RecordingHud _hud;
+        IDisposable _stateSub;
+
         public MainWindow()
         {
             Instance = this;
-            
+
             InitializeComponent();
 
             _helper = ServiceProvider.Get<MainWindowHelper>();
@@ -27,49 +43,109 @@ namespace Captura
 
             _helper.TimerModel.Init();
 
-            Loaded += (Sender, Args) =>
-            {
-                RepositionWindowIfOutside();
+            Loaded += OnLoaded;
+            Closing += OnClosing;
+            // Closed 仅在真正关闭时触发（Closing 未取消），用于清理 HUD
+            Closed += OnClosed;
 
-                ServiceProvider.Get<WebcamPage>().SetupPreview();
-
-                _helper.HotkeySetup.ShowUnregistered();
-            };
-
+            // --tray 或设置项要求启动即最小化到托盘
             if (App.CmdOptions.Tray || _helper.Settings.Tray.MinToTrayOnStartup)
                 Hide();
 
-            Closing += (Sender, Args) =>
-            {
-                if (!TryExit())
-                    Args.Cancel = true;
-            };
-
-            // Register to bring this instance to foreground when other instances are launched.
+            // 单实例：再次启动时唤醒已运行实例到前台
             SingleInstanceManager.StartListening(WakeApp);
         }
+
+        void OnLoaded(object Sender, RoutedEventArgs Args)
+        {
+            RepositionWindowIfOutside();
+
+            ServiceProvider.Get<WebcamPage>().SetupPreview();
+
+            _helper.HotkeySetup.ShowUnregistered();
+
+            // 订阅录制状态：进入 Recording/Paused 显示悬浮球，NotRecording 隐藏
+            _stateSub = _helper.RecordingViewModel.RecorderState.Subscribe(OnRecorderStateChanged);
+        }
+
+        void OnClosing(object Sender, System.ComponentModel.CancelEventArgs Args)
+        {
+            // 录制中拒绝退出（CanExit 会弹确认/提示）
+            if (!TryExit())
+                Args.Cancel = true;
+        }
+
+        void OnClosed(object Sender, EventArgs Args)
+        {
+            _stateSub?.Dispose();
+            CloseHud();
+        }
+
+        // ============ HUD 悬浮球 ============
+
+        void OnRecorderStateChanged(RecorderState State)
+        {
+            // 跨线程安全
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.Invoke(() => OnRecorderStateChanged(State));
+                return;
+            }
+
+            switch (State)
+            {
+                case RecorderState.Recording:
+                case RecorderState.Paused:
+                    ShowHud();
+                    break;
+                case RecorderState.NotRecording:
+                    CloseHud();
+                    break;
+            }
+        }
+
+        void ShowHud()
+        {
+            if (_hud == null)
+            {
+                _hud = new RecordingHud { Owner = this };
+                _hud.Closed += (S, E) => _hud = null;
+                _hud.Show();
+            }
+        }
+
+        void CloseHud()
+        {
+            if (_hud != null)
+            {
+                _hud.Close();
+                _hud = null;
+            }
+        }
+
+        // ============ 单实例唤醒 ============
 
         void WakeApp()
         {
             Dispatcher.Invoke(() =>
             {
                 if (WindowState == WindowState.Minimized)
-                {
                     WindowState = WindowState.Normal;
-                }
 
                 Activate();
             });
         }
 
+        // ============ 窗口位置恢复 ============
+
         void RepositionWindowIfOutside()
         {
-            // Window dimensions taking care of DPI
+            // 窗口尺寸考虑 DPI
             var rect = new RectangleF((float) Left,
                 (float) Top,
                 (float) ActualWidth,
                 (float) ActualHeight).ApplyDpi();
-            
+
             if (!Screen.AllScreens.Any(M => M.Bounds.Contains(rect)))
             {
                 Left = 50;
@@ -77,35 +153,45 @@ namespace Captura
             }
         }
 
-        void Grid_PreviewMouseLeftButtonDown(object Sender, MouseButtonEventArgs Args)
-        {
-            DragMove();
+        // ============ 顶栏 / 窗口控制 ============
 
-            Args.Handled = true;
+        // 顶栏空白区拖拽窗口
+        void TopBar_PreviewMouseLeftButtonDown(object Sender, MouseButtonEventArgs Args)
+        {
+            if (Args.ButtonState == MouseButtonState.Pressed)
+                DragMove();
         }
 
         void MinButton_Click(object Sender, RoutedEventArgs Args) => SystemCommands.MinimizeWindow(this);
 
         void CloseButton_Click(object Sender, RoutedEventArgs Args)
         {
+            // 关闭按钮：依设置决定最小化到托盘还是真正退出
             if (_helper.Settings.Tray.MinToTrayOnClose)
-            {
                 Hide();
-            }
             else Close();
         }
+
+        // ============ 托盘交互 ============
 
         void SystemTray_TrayMouseDoubleClick(object Sender, RoutedEventArgs Args)
         {
             if (Visibility == Visibility.Visible)
-            {
                 Hide();
-            }
             else this.ShowAndFocus();
         }
 
+        // 托盘菜单：显示主窗口
+        void ShowMainWindow(object Sender, RoutedEventArgs E) => this.ShowAndFocus();
+
+        // 托盘菜单：退出
+        void MenuExit_Click(object Sender, RoutedEventArgs Args) => Close();
+
+        // ============ 退出流程 ============
+
         bool TryExit()
         {
+            // 录制中不允许直接退出
             if (!_helper.RecordingViewModel.CanExit())
                 return false;
 
@@ -114,10 +200,31 @@ namespace Captura
             return true;
         }
 
-        void MenuExit_Click(object Sender, RoutedEventArgs Args) => Close();
+        // ============ 顶栏：设置 / 最近 ============
 
-        void HideButton_Click(object Sender, RoutedEventArgs Args) => Hide();
+        void OpenSettings(object Sender, RoutedEventArgs Args) => SettingsWindow.ShowInstance();
 
-        void ShowMainWindow(object Sender, RoutedEventArgs E) => this.ShowAndFocus();
+        void ToggleRecent(object Sender, RoutedEventArgs Args) => SettingsWindow.ShowRecent();
+
+        // ============ 场景保存 ============
+
+        void SaveScene_Click(object Sender, RoutedEventArgs Args)
+        {
+            var sceneVm = ServiceProvider.Get<SceneViewModel>();
+
+            var name = SimpleInputBox.Show(this, "保存场景",
+                "请输入场景名称：",
+                $"场景 {sceneVm.Scenes.Count + 1}");
+
+            if (!string.IsNullOrWhiteSpace(name))
+                sceneVm.SaveCurrentAsCommand.Execute(name);
+        }
+
+        // ============ 截图下拉 ============
+
+        void ToggleShotFlyout(object Sender, RoutedEventArgs Args) => ShotFlyout.IsOpen = !ShotFlyout.IsOpen;
+
+        // 点击变体后关闭 Popup
+        void ShotItem_Click(object Sender, MouseButtonEventArgs Args) => ShotFlyout.IsOpen = false;
     }
 }

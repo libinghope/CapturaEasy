@@ -1,4 +1,4 @@
-﻿using Captura.FFmpeg;
+using Captura.FFmpeg;
 using Captura.Hotkeys;
 using Captura.Models;
 
@@ -27,6 +27,8 @@ namespace Captura.ViewModels
             Binder.BindSingleton<VideoWritersViewModel>();
 
             Binder.BindSingleton<AudioSourceViewModel>();
+
+            Binder.BindSingleton<SceneViewModel>();
 
             Binder.BindSingleton<CustomOverlaysViewModel>();
             Binder.BindSingleton<CustomImageOverlaysViewModel>();

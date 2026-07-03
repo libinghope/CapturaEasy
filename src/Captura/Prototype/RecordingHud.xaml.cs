@@ -12,7 +12,7 @@ namespace Captura.Prototype
     /// 录制中悬浮球（HUD）。
     /// 行为：左键拖拽 / 单击切换展开控制条 / 悬浮球时长与 Pulse 由录制状态驱动。
     /// 窗口不抢焦点（ShowActivated=False），可悬浮在任何全屏应用之上。
-    /// 由 MainWindowV2 在 Recording/Paused 时 Show，NotRecording 时 Close。
+    /// 由 MainWindow 在 Recording/Paused 时 Show，NotRecording 时 Close。
     /// </summary>
     public partial class RecordingHud : Window
     {

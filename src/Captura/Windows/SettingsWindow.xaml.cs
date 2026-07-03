@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -54,6 +54,9 @@ namespace Captura
         }
 
         public static void ShowFFmpegLogs() => ShowPage("FFmpegLogs");
+
+        // 主窗口"最近录制"按钮入口：打开设置窗并定位到 RecentPage
+        public static void ShowRecent() => ShowPage("Recent");
 
         public static void ShowWebcamPage()
         {

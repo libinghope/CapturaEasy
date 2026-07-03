@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Threading;
 
-namespace Captura.Models
+namespace Captura
 {
     public class SyncContextManager
     {

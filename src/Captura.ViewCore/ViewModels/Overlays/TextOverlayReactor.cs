@@ -38,12 +38,12 @@ namespace Captura.ViewModels
 
             Foreground = Settings
                 .ObserveProperty(M => M.FontColor)
-                .Select(M => new SolidColorBrush(M.ToWpfColor()))
+                .Select(M => new SolidColorBrush(Color.FromArgb(M.A, M.R, M.G, M.B)))
                 .ToReadOnlyReactivePropertySlim();
 
             Background = Settings
                 .ObserveProperty(M => M.BackgroundColor)
-                .Select(M => new SolidColorBrush(M.ToWpfColor()))
+                .Select(M => new SolidColorBrush(Color.FromArgb(M.A, M.R, M.G, M.B)))
                 .ToReadOnlyReactivePropertySlim();
 
             BorderThickness = Settings
@@ -53,7 +53,7 @@ namespace Captura.ViewModels
 
             BorderBrush = Settings
                 .ObserveProperty(M => M.BorderColor)
-                .Select(M => new SolidColorBrush(M.ToWpfColor()))
+                .Select(M => new SolidColorBrush(Color.FromArgb(M.A, M.R, M.G, M.B)))
                 .ToReadOnlyReactivePropertySlim();
 
             CornerRadius = Settings

@@ -1,5 +1,4 @@
-﻿using System;
-using Captura.Models;
+using System;
 
 namespace Captura.Fakes
 {
@@ -12,6 +11,14 @@ namespace Captura.Fakes
                 Console.WriteLine(Header);
 
             Console.Error.WriteLine(Message);
+        }
+
+        public void ShowInfo(string Message, string Header = null)
+        {
+            if (Header != null)
+                Console.WriteLine(Header);
+
+            Console.WriteLine(Message);
         }
 
         public void ShowException(Exception Exception, string Message, bool Blocking = false)

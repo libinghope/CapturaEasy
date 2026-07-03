@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.Reactive.Linq;
 using System.Text;
 using System.Windows.Input;
+using Captura.Bootstrap;
 using Captura.Models;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;

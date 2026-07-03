@@ -1,7 +1,6 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Media;
 using Captura.ViewModels;
-using FirstFloor.ModernUI.Presentation;
 
 namespace Captura
 {
@@ -11,7 +10,7 @@ namespace Captura
         {
             if (E.NewValue != null && DataContext is ViewModelBase vm)
             {
-                AppearanceManager.Current.AccentColor = E.NewValue.Value;
+                ThemeService.ApplyAccent(E.NewValue.Value);
 
                 vm.Settings.UI.AccentColor = E.NewValue.Value.ToString();
             }
@@ -21,9 +20,7 @@ namespace Captura
         {
             if (DataContext is ViewModelBase vm)
             {
-                AppearanceManager.Current.ThemeSource = vm.Settings.UI.DarkTheme
-                    ? AppearanceManager.DarkThemeSource
-                    : AppearanceManager.LightThemeSource;
+                ThemeService.ApplyTheme(vm.Settings.UI.DarkTheme);
             }
         }
     }

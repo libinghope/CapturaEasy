@@ -1,7 +1,8 @@
-﻿<Page x:Class="Captura.AudioPage"
+<Page x:Class="Captura.AudioPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:captura="clr-namespace:Captura"
+      xmlns:audio="clr-namespace:Captura.Audio;assembly=Captura.Base"
       Title="{Binding Audio, Source={StaticResource Loc}, Mode=OneWay}">
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
@@ -66,21 +67,40 @@
                          Height="1"
                          Value="{Binding AudioSource.SelectedSpeakerPeakLevel.Value, Source={StaticResource ServiceLocator}, Mode=OneWay}"/>
 
-            <DockPanel Margin="0,10">
+            <StackPanel Margin="0,10">
+                <!-- 音质档位：标准 / 高清 / 无损 / 自定义 -->
                 <Label Content="{Binding Quality, Source={StaticResource Loc}, Mode=OneWay}"
-                       ContentStringFormat="{}{0}:"/>
-                <Label Content="{Binding Settings.Audio.Quality}"
-                       ContentStringFormat="{}{0:N0}%"
-                       Margin="5,0"
-                       MinWidth="30"
-                       HorizontalContentAlignment="Right"/>
-                <Slider Minimum="1" 
-                        Maximum="100"
-                        SelectionStart="70"
-                        SelectionEnd="90"
-                        IsSelectionRangeEnabled="True"
-                        Value="{Binding Settings.Audio.Quality}"/>
-            </DockPanel>
+                       ContentStringFormat="{}{0}:"
+                       Margin="0,0,0,3"/>
+                <WrapPanel Margin="0,0,0,8">
+                    <RadioButton Content="标准"
+                                 Margin="0,0,12,0"
+                                 IsChecked="{Binding Settings.Audio.QualityPreset, Converter={StaticResource EnumMatchConverter}, ConverterParameter={x:Static audio:AudioQualityPreset.Standard}, Mode=TwoWay}"/>
+                    <RadioButton Content="高清"
+                                 Margin="0,0,12,0"
+                                 IsChecked="{Binding Settings.Audio.QualityPreset, Converter={StaticResource EnumMatchConverter}, ConverterParameter={x:Static audio:AudioQualityPreset.HD}, Mode=TwoWay}"/>
+                    <RadioButton Content="无损"
+                                 Margin="0,0,12,0"
+                                 IsChecked="{Binding Settings.Audio.QualityPreset, Converter={StaticResource EnumMatchConverter}, ConverterParameter={x:Static audio:AudioQualityPreset.Lossless}, Mode=TwoWay}"/>
+                    <RadioButton Content="自定义"
+                                 IsChecked="{Binding Settings.Audio.QualityPreset, Converter={StaticResource EnumMatchConverter}, ConverterParameter={x:Static audio:AudioQualityPreset.Custom}, Mode=TwoWay}"/>
+                </WrapPanel>
+
+                <!-- 自定义档位下才显示 slider -->
+                <DockPanel Visibility="{Binding Settings.Audio.QualityPreset, Converter={StaticResource EnumMatchConverter}, ConverterParameter={x:Static audio:AudioQualityPreset.Custom}, Mode=OneWay}">
+                    <Label Content="{Binding Settings.Audio.Quality}"
+                           ContentStringFormat="{}{0:N0}%"
+                           Margin="5,0"
+                           MinWidth="30"
+                           HorizontalContentAlignment="Right"/>
+                    <Slider Minimum="1"
+                            Maximum="100"
+                            SelectionStart="70"
+                            SelectionEnd="90"
+                            IsSelectionRangeEnabled="True"
+                            Value="{Binding Settings.Audio.Quality}"/>
+                </DockPanel>
+            </StackPanel>
 
             <StackPanel Margin="0,20,0,0">
                 <CheckBox IsChecked="{Binding Settings.Audio.SeparateFilePerSource}"

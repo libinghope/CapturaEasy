@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 
-namespace Captura.Models
+namespace Captura
 {
     public interface IImageWriterItem
     {

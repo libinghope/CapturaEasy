@@ -1,5 +1,4 @@
-﻿using System.Windows.Forms;
-using Captura.Models;
+using System.Windows.Forms;
 using Ookii.Dialogs;
 
 namespace Captura.Windows
@@ -34,6 +33,19 @@ namespace Captura.Windows
             };
 
             return ofd.ShowDialog() == DialogResult.OK ? ofd.FileName : null;
+        }
+
+        public string SaveFile(string InitialFileName, string DefaultExt, string Filter)
+        {
+            var sfd = new SaveFileDialog
+            {
+                FileName = InitialFileName,
+                DefaultExt = DefaultExt,
+                Filter = Filter,
+                OverwritePrompt = true
+            };
+
+            return sfd.ShowDialog() == DialogResult.OK ? sfd.FileName : null;
         }
     }
 }

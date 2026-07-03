@@ -38,6 +38,7 @@
     <PackageReference Include="CommandLineParser" Version="2.2.1" />
     <PackageReference Include="Extended.Wpf.Toolkit" Version="3.0.0" />
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.0.8" />
+    <PackageReference Include="MaterialDesignThemes" Version="5.3.2" />
     <PackageReference Include="ModernUI.WPF" Version="1.0.9" />
     <PackageReference Include="SamOatesGames.ModernUI.Xceed.Toolkit" Version="1.0.0" />
   </ItemGroup>
@@ -45,14 +46,11 @@
        Captura 运行时按 AppDir\Codecs 约定查找（见 FFMpegSettings.GetFolderPath）。
        源文件位于解决方案根的 lib\ffmpeg\，不入版本库（见 .gitignore）；
        团队/CI 需自行下载 ffmpeg shared 构建并解压到 lib\ffmpeg\。-->
-  <Target Name="CopyFFmpeg" BeforeTargets="Build"
-          Condition="Exists('$(MSBuildThisFileDirectory)..\..\lib\ffmpeg\ffmpeg.exe')">
+  <Target Name="CopyFFmpeg" BeforeTargets="Build" Condition="Exists('$(MSBuildThisFileDirectory)..\..\lib\ffmpeg\ffmpeg.exe')">
     <ItemGroup>
       <FFmpegFiles Include="$(MSBuildThisFileDirectory)..\..\lib\ffmpeg\**\*.*" />
     </ItemGroup>
-    <Copy SourceFiles="@(FFmpegFiles)"
-          DestinationFolder="$(OutputPath)Codecs"
-          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(FFmpegFiles)" DestinationFolder="$(OutputPath)Codecs" SkipUnchangedFiles="true" />
   </Target>
 
   <Target Name="Delete unused libs" AfterTargets="Build">

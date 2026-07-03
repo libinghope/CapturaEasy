@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
-namespace Captura.Models
+namespace Captura
 {
     public interface IImageUploader
     {

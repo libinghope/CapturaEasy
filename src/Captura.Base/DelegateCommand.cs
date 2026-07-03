@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Windows.Input;
-using Captura.Models;
 
 namespace Captura
 {

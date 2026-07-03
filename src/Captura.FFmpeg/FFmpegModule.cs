@@ -1,4 +1,4 @@
-﻿using Captura.Audio;
+using Captura.Audio;
 using Captura.Video;
 
 namespace Captura.FFmpeg
@@ -17,6 +17,7 @@ namespace Captura.FFmpeg
             }
 
             Binder.Bind<IVideoConverter>(() => new FFmpegGifConverter());
+            Binder.Bind<IVideoConverter>(() => new FFmpegVideoConverter(new X264VideoCodec()));
             Binder.Bind<IVideoConverter>(() => new FFmpegVideoConverter(new Vp8VideoCodec()));
             Binder.Bind<IVideoConverter>(() => new FFmpegVideoConverter(new Vp9VideoCodec()));
         }

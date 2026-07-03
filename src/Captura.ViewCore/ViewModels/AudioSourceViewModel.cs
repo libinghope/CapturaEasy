@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Captura.Audio;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Windows.Input;
 using Reactive.Bindings;
 using Reactive.Bindings.Extensions;
 
-namespace Captura.Models
+namespace Captura.ViewModels
 {
     public class AudioSourceViewModel : NotifyPropertyChanged
     {
