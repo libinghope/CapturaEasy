@@ -1,0 +1,128 @@
+<!--
+    CapturaEasy 阶段 2 原型：录制中悬浮球（HUD）
+    设计目标（借鉴 EV录屏 核心范式）：
+      1. 录制开始后，控制权从主窗口让渡给桌面悬浮球，主窗口可最小化
+      2. 收起态：64px 圆形小球，红色脉冲 + 实时时长，不挡画面
+      3. 展开态：左侧扇出 5 个控制按钮（暂停/停止/截图/画笔/光标）
+      4. 可拖拽到任意位置
+    实现要点：
+      - 独立透明顶层 Window，AllowsTransparency + WS_EX_NOACTIVATE（不抢焦点）
+      - 全部绑定到现有 ServiceLocator，无需新增 ViewModel
+-->
+<Window x:Class="Captura.Prototype.RecordingHud"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:Captura"
+        Title="RecordingHud"
+        Width="340" Height="80"
+        SizeToContent="Manual"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        Topmost="True"
+        ResizeMode="NoResize"
+        ShowActivated="False"
+        WindowStartupLocation="Manual">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/><!-- 展开后控制条 -->
+            <ColumnDefinition Width="Auto"/><!-- 悬浮球本体 -->
+        </Grid.ColumnDefinitions>
+
+        <!-- ============ 展开态：控制条 ============ -->
+        <Border x:Name="ControlBar" Grid.Column="0"
+                CornerRadius="32" Padding="6"
+                Margin="0,0,10,0"
+                Background="#E6202020"
+                BorderThickness="1" BorderBrush="#44FFFFFF"
+                Visibility="Collapsed"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <!-- 暂停/恢复：Recording 显暂停图标，Paused 显播放图标 -->
+                <local:ModernButton x:Name="PauseBtn" Width="44" Height="44"
+                                    Foreground="White"
+                                    IconData="{Binding Icons.Pause, Source={StaticResource ServiceLocator}}"
+                                    Command="{Binding RecordingViewModel.PauseCommand, Source={StaticResource ServiceLocator}}"
+                                    ToolTip="暂停/恢复">
+                    <local:ModernButton.Style>
+                        <Style TargetType="local:ModernButton">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding RecordingViewModel.RecorderState.Value, Source={StaticResource ServiceLocator}}" Value="Paused">
+                                    <Setter Property="IconData" Value="{Binding Icons.Record, Source={StaticResource ServiceLocator}}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </local:ModernButton.Style>
+                </local:ModernButton>
+
+                <!-- 停止 -->
+                <local:ModernButton Width="44" Height="44"
+                                    Foreground="#ff5252"
+                                    IconData="{Binding Icons.Stop, Source={StaticResource ServiceLocator}}"
+                                    Command="{Binding RecordingViewModel.RecordCommand, Source={StaticResource ServiceLocator}}"
+                                    ToolTip="停止"/>
+
+                <!-- 分隔 -->
+                <Border Width="1" Margin="4,10" Background="#44FFFFFF"/>
+
+                <!-- 截图 -->
+                <local:ModernButton Width="44" Height="44"
+                                    Foreground="White"
+                                    IconData="{Binding Icons.Camera, Source={StaticResource ServiceLocator}}"
+                                    Command="{Binding ScreenShotViewModel.ScreenShotCommand, Source={StaticResource ServiceLocator}}"
+                                    ToolTip="截图"/>
+
+                <!-- 画笔（录制中实时标注，阶段3做全屏 InkCanvas 浮层）-->
+                <local:ModernButton Width="44" Height="44"
+                                    Foreground="White"
+                                    IconData="{Binding Icons.Brush, Source={StaticResource ServiceLocator}}"
+                                    Click="Brush_Click"
+                                    ToolTip="画笔标注"/>
+
+                <!-- 光标开关 -->
+                <local:ModernToggleButton Width="44" Height="44"
+                                          Foreground="White"
+                                          IconData="{Binding Icons.Cursor, Source={StaticResource ServiceLocator}}"
+                                          IsChecked="{Binding Settings.IncludeCursor, Mode=TwoWay}"
+                                          ToolTip="显示鼠标光标"/>
+            </StackPanel>
+        </Border>
+
+        <!-- ============ 悬浮球本体 ============ -->
+        <Grid Grid.Column="1" Width="64" Height="64"
+              MouseLeftButtonDown="Ball_MouseLeftButtonDown"
+              MouseEnter="Ball_MouseEnter"
+              MouseLeave="Ball_MouseLeave">
+            <!-- 外圈脉冲动画（仅 Recording 态）-->
+            <Ellipse x:Name="PulseRing" Stroke="#66ee2c2c" StrokeThickness="2" Fill="Transparent"
+                     RenderTransformOrigin="0.5,0.5">
+                <Ellipse.RenderTransform>
+                    <ScaleTransform x:Name="PulseScale" ScaleX="1" ScaleY="1"/>
+                </Ellipse.RenderTransform>
+            </Ellipse>
+
+            <!-- 球体 -->
+            <Border x:Name="BallBody" Width="56" Height="56"
+                    CornerRadius="28"
+                    Background="#E6202020"
+                    BorderBrush="#CCee2c2c" BorderThickness="2"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <!-- 收起态：显示时长；展开后：显示停止图标提示 -->
+                    <TextBlock x:Name="BallTime" Text="00:00"
+                               Foreground="White" FontWeight="SemiBold" FontFamily="Consolas"
+                               FontSize="13" HorizontalAlignment="Center"/>
+                    <TextBlock Text="点击展开" FontSize="8" Foreground="#99FFFFFF"
+                               HorizontalAlignment="Center" Margin="0,1,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- 实时绑定时长（绑定到 Text，隐藏式驱动更新）-->
+            <TextBlock x:Name="TimeBinder"
+                       Text="{Binding TimerModel.TimeSpan, Source={StaticResource ServiceLocator}, StringFormat=mm\\:ss}"
+                       Visibility="Collapsed"/>
+        </Grid>
+    </Grid>
+</Window>

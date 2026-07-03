@@ -1,4 +1,4 @@
-﻿using FirstFloor.ModernUI.Presentation;
+using FirstFloor.ModernUI.Presentation;
 using System;
 using System.IO;
 using System.Linq;
@@ -51,8 +51,15 @@ namespace Captura
             ServiceProvider.LoadModule(new CoreModule());
             ServiceProvider.LoadModule(new ViewCoreModule());
 
+            // --v2 不走 CommandLineParser（避免未知参数导致 WithParsed 不触发、CmdOptions 为 null）
+            bool launchV2 = Args.Args.Any(a => string.Equals(a, "--v2", StringComparison.OrdinalIgnoreCase));
+
             Parser.Default.ParseArguments<CmdOptions>(Args.Args)
                 .WithParsed(M => CmdOptions = M);
+
+            // 兜底默认实例，防止解析失败时 CmdOptions 为 null
+            if (CmdOptions == null)
+                CmdOptions = new CmdOptions();
 
             if (CmdOptions.Settings != null)
             {
@@ -66,6 +73,18 @@ namespace Captura
             BindLanguageSetting(settings);
 
             BindKeymapSetting(settings);
+
+            // 决定启动哪个主窗口：--v2 进原型，否则进原版
+            // App.xaml 不设 StartupUri，完全由此处控制
+            if (launchV2)
+            {
+                MainWindow = new Prototype.MainWindowV2();
+            }
+            else
+            {
+                MainWindow = new MainWindow();
+            }
+            MainWindow.Show();
         }
 
         void OnCurrentDomainOnUnhandledException(object S, UnhandledExceptionEventArgs E)

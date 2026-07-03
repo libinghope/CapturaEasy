@@ -20,3 +20,8 @@ TestResults/
 /temp/
 /dist/
 *.pfx
+
+# FFmpeg 二进制（shared 构建，约 180MB，不入版本库）
+# 团队/CI 需自行下载解压到此目录
+/lib/ffmpeg/*.exe
+/lib/ffmpeg/*.dll
