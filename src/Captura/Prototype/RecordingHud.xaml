@@ -91,15 +91,16 @@
         </Border>
 
         <!-- ============ 悬浮球本体 ============ -->
+        <!-- 三个鼠标事件全部在 Grid 上注册，CaptureMouse 后仍路由到此 Grid 的处理器 -->
         <Grid Grid.Column="1" Width="64" Height="64"
               MouseLeftButtonDown="Ball_MouseLeftButtonDown"
-              MouseEnter="Ball_MouseEnter"
-              MouseLeave="Ball_MouseLeave">
+              MouseMove="Ball_MouseMove"
+              MouseLeftButtonUp="Ball_MouseLeftButtonUp">
             <!-- 外圈脉冲动画（仅 Recording 态）-->
             <Ellipse x:Name="PulseRing" Stroke="#66ee2c2c" StrokeThickness="2" Fill="Transparent"
                      RenderTransformOrigin="0.5,0.5">
                 <Ellipse.RenderTransform>
-                    <ScaleTransform x:Name="PulseScale" ScaleX="1" ScaleY="1"/>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
                 </Ellipse.RenderTransform>
             </Ellipse>
 
@@ -109,20 +110,46 @@
                     Background="#E6202020"
                     BorderBrush="#CCee2c2c" BorderThickness="2"
                     HorizontalAlignment="Center" VerticalAlignment="Center">
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <!-- 收起态：显示时长；展开后：显示停止图标提示 -->
-                    <TextBlock x:Name="BallTime" Text="00:00"
-                               Foreground="White" FontWeight="SemiBold" FontFamily="Consolas"
-                               FontSize="13" HorizontalAlignment="Center"/>
-                    <TextBlock Text="点击展开" FontSize="8" Foreground="#99FFFFFF"
-                               HorizontalAlignment="Center" Margin="0,1,0,0"/>
-                </StackPanel>
-            </Border>
+                <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <!-- 倒计时阶段：显示大号倒计时数字 -->
+                    <StackPanel Visibility="Collapsed">
+                        <TextBlock Text="{Binding TimerModel.Countdown, Source={StaticResource ServiceLocator}}"
+                                   Foreground="#FFFF5252" FontWeight="Bold" FontFamily="Consolas"
+                                   FontSize="26" HorizontalAlignment="Center"/>
+                        <TextBlock Text="准备中" FontSize="8" Foreground="#99FFFFFF"
+                                   HorizontalAlignment="Center" Margin="0,1,0,0"/>
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding TimerModel.Waiting, Source={StaticResource ServiceLocator}}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                    </StackPanel>
 
-            <!-- 实时绑定时长（绑定到 Text，隐藏式驱动更新）-->
-            <TextBlock x:Name="TimeBinder"
-                       Text="{Binding TimerModel.TimeSpan, Source={StaticResource ServiceLocator}, StringFormat=mm\\:ss}"
-                       Visibility="Collapsed"/>
+                    <!-- 正常录制阶段：显示录制时长 -->
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock Text="{Binding TimerModel.TimeSpan, Source={StaticResource ServiceLocator}, StringFormat=mm\\:ss}"
+                                   Foreground="White" FontWeight="SemiBold" FontFamily="Consolas"
+                                   FontSize="13" HorizontalAlignment="Center"/>
+                        <TextBlock Text="点击展开" FontSize="8" Foreground="#99FFFFFF"
+                                   HorizontalAlignment="Center" Margin="0,1,0,0"/>
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding TimerModel.Waiting, Source={StaticResource ServiceLocator}}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                    </StackPanel>
+                </Grid>
+            </Border>
         </Grid>
     </Grid>
 </Window>

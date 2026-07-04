@@ -1,15 +1,25 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using Captura.Video;
 
 namespace Captura.MouseKeyHook
 {
+    /// <summary>
+    /// 鼠标点击涟漪高亮 overlay。
+    /// 点击瞬间在点击位置生成一个扩散涟漪（半径从 0.3→2.0 倍，透明度从 0.9→0），
+    /// 持续约 600ms 后消失。支持多次连击叠加（每个涟漪独立播放）。
+    /// 左键黄色、右键蓝色、中键绿色。
+    /// </summary>
     public class MouseClickOverlay : IOverlay
     {
         readonly MouseClickSettings _settings;
-        bool _clicked;
-        MouseButtons _buttons;
+
+        // 涟漪队列：支持快速连击时多个涟漪同时播放
+        readonly List<Ripple> _ripples = new List<Ripple>();
+
+        const int RippleDurationMs = 600;
 
         public MouseClickOverlay(IMouseKeyHook Hook,
             MouseClickSettings Settings)
@@ -18,109 +28,108 @@ namespace Captura.MouseKeyHook
 
             Hook.MouseDown += (S, E) =>
             {
-                _clicked = true;
+                if (!_settings.Display)
+                    return;
 
-                _buttons = E.Button;
+                // 在点击瞬间记录位置（涟漪不跟随光标移动）
+                var loc = ServiceProvider.Get<IPlatformServices>().CursorPosition;
+
+                _ripples.Add(new Ripple
+                {
+                    StartUtc = DateTime.UtcNow,
+                    Location = loc,
+                    Buttons = E.Button
+                });
+
+                // 限制队列长度，避免疯狂连击堆积
+                if (_ripples.Count > 8)
+                    _ripples.RemoveRange(0, _ripples.Count - 8);
             };
-
-            Hook.MouseUp += (S, E) => _clicked = false;
         }
 
         public void Dispose() { }
 
         public void Draw(IEditableFrame Editor, Func<Point, Point> PointTransform = null)
         {
-            if (!_settings.Display)
+            if (!_settings.Display || _ripples.Count == 0)
                 return;
 
-            if (_clicked && _currentMouseRatio < MouseRatioMax)
-            {
-                _currentMouseRatio += MouseRatioDeltaUp;
+            var now = DateTime.UtcNow;
+            var baseRadius = _settings.Radius;
 
-                if (_currentMouseRatio > MouseRatioMax)
+            // 倒序遍历以便安全移除已完成的涟漪
+            for (int i = _ripples.Count - 1; i >= 0; i--)
+            {
+                var r = _ripples[i];
+                var elapsedMs = (now - r.StartUtc).TotalMilliseconds;
+
+                if (elapsedMs >= RippleDurationMs)
                 {
-                    _currentMouseRatio = MouseRatioMax;
+                    _ripples.RemoveAt(i);
+                    continue;
                 }
-            }
-            else if (!_clicked && _currentMouseRatio > MouseRatioMin)
-            {
-                _currentMouseRatio -= MouseRatioDeltaDown;
 
-                if (_currentMouseRatio < MouseRatioMin)
-                {
-                    _currentMouseRatio = MouseRatioMin;
-                }
-            }
+                var progress = elapsedMs / RippleDurationMs; // 0 → 1
 
-            if (_currentMouseRatio > MouseRatioMin)
-            {
-                var clickRadius = _settings.Radius * _currentMouseRatio;
+                // 扩散半径：从 0.3 倍到 2.0 倍
+                var radius = baseRadius * (0.3f + (float)progress * 1.7f);
 
-                var platformServices = ServiceProvider.Get<IPlatformServices>();
+                // 透明度：从 0.9 衰减到 0（前 15% 淡入，后 85% 淡出）
+                float alpha;
+                if (progress < 0.15)
+                    alpha = (float)(progress / 0.15) * 0.9f;
+                else
+                    alpha = 0.9f * (1 - (float)((progress - 0.15) / 0.85));
 
-                var curPos = platformServices.CursorPosition;
-
+                var loc = r.Location;
                 if (PointTransform != null)
-                    curPos = PointTransform(curPos);
+                    loc = PointTransform(loc);
 
-                var d = clickRadius * 2;
+                var color = GetClickCircleColor(r.Buttons);
+                color = Color.FromArgb(ToByte(color.A * alpha), color);
 
-                var x = curPos.X - clickRadius;
-                var y = curPos.Y - clickRadius;
+                var d = radius * 2;
+                var x = loc.X - radius;
+                var y = loc.Y - radius;
 
-                var color = GetClickCircleColor();
-
-                color = Color.FromArgb(ToByte(color.A * _currentMouseRatio), color);
-
+                // 实心半透明圆
                 Editor.FillEllipse(color, new RectangleF(x, y, d, d));
 
-                var border = _settings.BorderThickness * _currentMouseRatio;
-
+                // 圆环边框（更聚焦的视觉强调）
+                var border = _settings.BorderThickness;
                 if (border > 0)
                 {
-                    x -= border / 2f;
-                    y -= border / 2f;
-                    d += border;
-
                     var borderColor = _settings.BorderColor;
-
-                    borderColor = Color.FromArgb(ToByte(borderColor.A * _currentMouseRatio), borderColor);
+                    borderColor = Color.FromArgb(ToByte(borderColor.A * alpha), borderColor);
 
                     Editor.DrawEllipse(borderColor, border, new RectangleF(x, y, d, d));
                 }
             }
         }
 
-        Color GetClickCircleColor()
+        Color GetClickCircleColor(MouseButtons Buttons)
         {
-            if (_buttons.HasFlag(MouseButtons.Right))
-            {
+            if (Buttons.HasFlag(MouseButtons.Right))
                 return _settings.RightClickColor;
-            }
 
-            if (_buttons.HasFlag(MouseButtons.Middle))
-            {
+            if (Buttons.HasFlag(MouseButtons.Middle))
                 return _settings.MiddleClickColor;
-            }
 
             return _settings.Color;
         }
 
         static byte ToByte(double Value)
         {
-            if (Value > 255)
-                return 255;
-
-            if (Value < 0)
-                return 0;
-
+            if (Value > 255) return 255;
+            if (Value < 0) return 0;
             return (byte)Value;
         }
 
-        float _currentMouseRatio;
-        const float MouseRatioDeltaUp = 0.9f;
-        const float MouseRatioDeltaDown = 0.25f;
-        const float MouseRatioMin = 0.6f;
-        const float MouseRatioMax = 1.2f;
+        struct Ripple
+        {
+            public DateTime StartUtc;
+            public Point Location;
+            public MouseButtons Buttons;
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿// Adapted from https://github.com/jasonpang/desktop-duplication-net
+// Adapted from https://github.com/jasonpang/desktop-duplication-net
 
 using SharpDX.DXGI;
 using System;
@@ -29,14 +29,20 @@ namespace Captura.Windows.DesktopDuplication
         
         public IEditableFrame Capture()
         {
+            // Dispose 可能与 Capture 并发执行（停止录制时的竞态）
+            var dupl = _duplCapture;
+            var editor = _editorSession;
+            if (dupl == null || editor == null)
+                return RepeatFrame.Instance;
+
             try
             {
-                if (!_duplCapture.Get(_editorSession.DesktopTexture, _mousePointer))
+                if (!dupl.Get(editor.DesktopTexture, _mousePointer))
                     return RepeatFrame.Instance;
             }
             catch
             {
-                try { _duplCapture.Init(); }
+                try { dupl.Init(); }
                 catch
                 {
                     // ignored
@@ -45,11 +51,11 @@ namespace Captura.Windows.DesktopDuplication
                 return RepeatFrame.Instance;
             }
 
-            var editor = new Direct2DEditor(_editorSession);
+            var ed = new Direct2DEditor(editor);
 
-            _mousePointer?.Draw(editor);
+            _mousePointer?.Draw(ed);
 
-            return editor;
+            return ed;
         }
 
         public void Dispose()

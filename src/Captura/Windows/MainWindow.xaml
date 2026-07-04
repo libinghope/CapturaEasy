@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:Captura"
         DataContext="{Binding MainViewModel, Source={StaticResource ServiceLocator}}"
         Title="CapturaEasy"
-        Width="560"
+        Width="1020"
         SizeToContent="Height"
         ResizeMode="CanMinimize"
         WindowStartupLocation="CenterScreen"
@@ -408,12 +408,13 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Height="44"
+            <Button Grid.Column="0" Height="44" Padding="0"
                     Command="{Binding RecordingViewModel.RecordCommand, Source={StaticResource ServiceLocator}}"
                     IsEnabled="{Binding ViewConditions.IsEnabled.Value, Source={StaticResource ServiceLocator}}"
                     Margin="0,0,8,0">
                 <Button.Style>
                     <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                        <Setter Property="Background" Value="{DynamicResource Accent}"/>
                         <Setter Property="Content">
                             <Setter.Value>
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
@@ -445,11 +446,14 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0" Height="44" Width="60"
+                        Padding="0"
+                        Background="{DynamicResource Accent}"
                         Command="{Binding ScreenShotViewModel.ScreenShotCommand, Source={StaticResource ServiceLocator}}" ToolTip="截图（当前源）">
                     <Path Width="18" Height="18" Stretch="Uniform" Fill="White"
                           Data="{Binding Icons.Camera, Source={StaticResource ServiceLocator}}"/>
                 </Button>
                 <Button Grid.Column="1" x:Name="ShotDropDown" Height="44" Width="22"
+                        Padding="0"
                         Click="ToggleShotFlyout" ToolTip="更多截图方式">
                     <Path Width="8" Height="8" Stretch="Uniform" Data="M7,10L12,15L17,10H7Z" Fill="{DynamicResource ItemText}"/>
                 </Button>

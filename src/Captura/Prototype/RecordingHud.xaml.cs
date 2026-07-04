@@ -1,10 +1,7 @@
 using System;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using System.ComponentModel;
 
 namespace Captura.Prototype
 {
@@ -16,9 +13,9 @@ namespace Captura.Prototype
     /// </summary>
     public partial class RecordingHud : Window
     {
-        Point _dragOffset;
-        bool _dragging;
-        bool _expanded;
+        Point _downPos;
+        bool _moved;
+        DrawingOverlay _drawingOverlay;
 
         public RecordingHud()
         {
@@ -28,14 +25,17 @@ namespace Captura.Prototype
 
         void OnLoaded(object sender, RoutedEventArgs e)
         {
-            // 将隐藏 TextBinder 的文本同步显示到球面（避开 XAML 中重复绑定的麻烦）
-            var dpd = DependencyPropertyDescriptor.FromProperty(TextBlock.TextProperty, typeof(TextBlock));
-            dpd?.AddValueChanged(TimeBinder, (s, ev) => BallTime.Text = TimeBinder.Text);
-
             // 初始定位到屏幕右下角
             PositionBottomRight();
 
             UpdatePulse();
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            // HUD 关闭时一并关闭画笔浮层
+            _drawingOverlay?.Close();
+            base.OnClosed(e);
         }
 
         void PositionBottomRight()
@@ -45,56 +45,70 @@ namespace Captura.Prototype
             Top = workArea.Bottom - Height - 20;
         }
 
-        // 拖拽：记录起始偏移
+        // ============ 拖拽 + 单击展开 ============
+
         void Ball_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            _dragging = false;
-            _dragOffset = e.GetPosition(this);
-            ((UIElement)sender).CaptureMouse();
+            _downPos = e.GetPosition(this);
+            _moved = false;
         }
 
-        void Ball_MouseEnter(object sender, MouseEventArgs e) { }
-        void Ball_MouseLeave(object sender, MouseEventArgs e) { }
-
-        // 通过 Capture + Move 判断是拖拽还是单击
-        protected override void OnMouseMove(MouseEventArgs e)
+        void Ball_MouseMove(object sender, MouseEventArgs e)
         {
-            base.OnMouseMove(e);
-            if (e.LeftButton == MouseButtonState.Pressed && IsMouseCaptured)
-            {
-                var pos = e.GetPosition(this);
-                if ((pos - _dragOffset).Length > 4) _dragging = true;
+            if (e.LeftButton != MouseButtonState.Pressed || _moved)
+                return;
 
-                if (_dragging)
-                {
-                    var screen = PointToScreen(pos);
-                    Left = screen.X - _dragOffset.X;
-                    Top = screen.Y - _dragOffset.Y;
-                }
+            var pos = e.GetPosition(this);
+            var dx = Math.Abs(pos.X - _downPos.X);
+            var dy = Math.Abs(pos.Y - _downPos.Y);
+
+            // 移动超过 4 像素才判定为拖拽
+            if (dx > 4 || dy > 4)
+            {
+                _moved = true;
+                // DragMove 是阻塞调用，自动处理 DPI 和坐标，直到鼠标释放后返回
+                DragMove();
             }
         }
 
-        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+        void Ball_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            base.OnMouseLeftButtonUp(e);
-            ReleaseMouseCapture();
-            if (!_dragging) ToggleExpand();
-            _dragging = false;
+            // 没有真正拖拽 → 视为单击，切换展开/收起
+            if (!_moved)
+                ToggleExpand();
+
+            _moved = false;
         }
 
         // 展开/收起控制条
         void ToggleExpand()
         {
-            _expanded = !_expanded;
-            ControlBar.Visibility = _expanded ? Visibility.Visible : Visibility.Collapsed;
-            Width = _expanded ? 340 : 80;
+            ControlBar.Visibility = ControlBar.Visibility == Visibility.Visible
+                ? Visibility.Collapsed
+                : Visibility.Visible;
+
+            Width = ControlBar.Visibility == Visibility.Visible ? 340 : 80;
         }
 
-        // 画笔：阶段3将接入全屏 InkCanvas 透明浮层
+        // 画笔标注：切换全屏 InkCanvas 浮层
         void Brush_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("画笔标注浮层将在阶段3实现：全屏透明 InkCanvas + 工具条。",
-                "CapturaEasy 阶段 2", MessageBoxButton.OK, MessageBoxImage.Information);
+            if (_drawingOverlay != null && _drawingOverlay.IsVisible)
+            {
+                // 已显示 → 隐藏
+                _drawingOverlay.Hide();
+                return;
+            }
+
+            if (_drawingOverlay == null)
+            {
+                _drawingOverlay = new DrawingOverlay { Owner = null };
+                // 用户从浮层内点击"退出标注"时，同步状态（下次点击会重新创建/显示）
+                _drawingOverlay.Exited += (s, ev) => { };
+                _drawingOverlay.Closed += (s, ev) => _drawingOverlay = null;
+            }
+
+            _drawingOverlay.Show();
         }
 
         // 红圈脉冲：呼吸效果
@@ -105,7 +119,7 @@ namespace Captura.Prototype
             anim.KeyFrames.Add(new LinearDoubleKeyFrame(0.0, KeyTime.FromTimeSpan(TimeSpan.Zero)));
             anim.KeyFrames.Add(new LinearDoubleKeyFrame(0.9, KeyTime.FromTimeSpan(TimeSpan.FromSeconds(0.9))));
             Storyboard.SetTarget(anim, PulseRing);
-            Storyboard.SetTargetProperty(anim, new PropertyPath(Ellipse.OpacityProperty));
+            Storyboard.SetTargetProperty(anim, new PropertyPath("Opacity"));
             sb.Children.Add(anim);
             sb.Begin();
         }

@@ -120,7 +120,7 @@ namespace Captura
 
         public int PreStartCountdown
         {
-            get => Get(0);
+            get => Get(5);
             set => Set(value);
         }
 

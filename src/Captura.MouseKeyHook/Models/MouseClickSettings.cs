@@ -1,9 +1,16 @@
-﻿using System.Drawing;
+using System.Drawing;
 
 namespace Captura.MouseKeyHook
 {
     public class MouseClickSettings : MouseOverlaySettings
     {
+        // 重写 Display 默认值：点击高亮默认开启（基类 MouseOverlaySettings.Display 默认 false）
+        public new bool Display
+        {
+            get => Get(true);
+            set => Set(value);
+        }
+
         public Color RightClickColor
         {
             get => Get(Color.FromArgb(3, 169, 244));

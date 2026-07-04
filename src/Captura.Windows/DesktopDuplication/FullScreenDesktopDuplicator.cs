@@ -56,11 +56,19 @@ namespace Captura.Windows.DesktopDuplication
 
         public IEditableFrame Capture()
         {
+            // Dispose 可能与 Capture 并发执行（停止录制时的竞态）
+            var editorSession = _editorSession;
+            if (editorSession == null)
+                return RepeatFrame.Instance;
+
             foreach (var entry in _outputs)
             {
+                if (entry.DuplCapture == null)
+                    continue;
+
                 try
                 {
-                    if (!entry.DuplCapture.Get(_editorSession.DesktopTexture, entry.MousePointer, entry.Location))
+                    if (!entry.DuplCapture.Get(editorSession.DesktopTexture, entry.MousePointer, entry.Location))
                         return RepeatFrame.Instance;
                 }
                 catch
@@ -72,10 +80,10 @@ namespace Captura.Windows.DesktopDuplication
                     }
 
                     return RepeatFrame.Instance;
-                }                
+                }
             }
 
-            var editor = new Direct2DEditor(_editorSession);
+            var editor = new Direct2DEditor(editorSession);
 
             foreach (var entry in _outputs)
             {

@@ -8,6 +8,7 @@ using System.Windows.Media;
 using Captura.Bootstrap;
 using Captura.Models;
 using Captura.Prototype;
+using Captura.Video;
 using Captura.ViewModels;
 
 namespace Captura
@@ -29,6 +30,8 @@ namespace Captura
         // 录制中悬浮球（HUD）：Recording/Paused 时自动弹出，NotRecording 时关闭
         RecordingHud _hud;
         IDisposable _stateSub;
+        // 记住录制开始时区域选择器是否可见，停止后恢复
+        bool _regionWasVisible;
 
         public MainWindow()
         {
@@ -93,14 +96,22 @@ namespace Captura
                 return;
             }
 
+            // 录制期间隐藏区域选择器（它是 Topmost 透明窗口，会挡住主窗口按钮）
+            var regionProvider = ServiceProvider.Get<IRegionProvider>();
+
             switch (State)
             {
                 case RecorderState.Recording:
                 case RecorderState.Paused:
+                    // 记住区域选择器原状态，录制结束后恢复
+                    _regionWasVisible = regionProvider.SelectorVisible;
+                    regionProvider.SelectorVisible = false;
                     ShowHud();
                     break;
                 case RecorderState.NotRecording:
                     CloseHud();
+                    // 恢复区域选择器可见性
+                    regionProvider.SelectorVisible = _regionWasVisible;
                     break;
             }
         }

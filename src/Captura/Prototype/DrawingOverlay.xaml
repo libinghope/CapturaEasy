@@ -1,0 +1,105 @@
+<!--
+    CapturaEasy 阶段 5：录制中实时画笔标注浮层。
+    设计：
+      - 全屏透明顶层窗口，覆盖整个虚拟屏幕（SystemParameters.VirtualScreenWidth/Height）
+      - 内含一个全屏 InkCanvas 承载笔画
+      - 顶部居中一个可拖拽的工具条：画笔 / 橡皮擦 / 颜色 / 线宽 / 撤销 / 清除 / 退出
+      - 不抢焦点（ShowActivated=False + WS_EX_NOACTIVATE），HUD 仍可点击
+    由 RecordingHud 的画笔按钮触发显示/隐藏。
+-->
+<Window x:Class="Captura.Prototype.DrawingOverlay"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="DrawingOverlay"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        Topmost="True"
+        ResizeMode="NoResize"
+        ShowActivated="False"
+        WindowStartupLocation="Manual">
+    <Grid>
+        <!-- 全屏绘画画布 -->
+        <InkCanvas x:Name="InkCanvas"
+                   Background="Transparent"/>
+
+        <!-- 工具条 -->
+        <Border x:Name="Toolbar"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                Margin="0,16,0,0"
+                CornerRadius="22"
+                Padding="6"
+                Background="#E6202020"
+                BorderBrush="#44FFFFFF"
+                BorderThickness="1"
+                MouseLeftButtonDown="Toolbar_MouseLeftButtonDown">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <!-- 画笔 -->
+                <Button x:Name="PenBtn" Width="40" Height="40" Margin="2,0"
+                        Click="Pen_Click" ToolTip="画笔">
+                    <Path Width="18" Height="18" Stretch="Uniform" Fill="White"
+                          Data="M3,17.25V21H6.75L17.81,9.94L14.06,6.19L3,17.25M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.13,5.12L18.88,8.87L20.71,7.04Z"/>
+                </Button>
+
+                <!-- 橡皮擦 -->
+                <Button x:Name="EraserBtn" Width="40" Height="40" Margin="2,0"
+                        Click="Eraser_Click" ToolTip="橡皮擦">
+                    <Path Width="18" Height="18" Stretch="Uniform" Fill="White"
+                          Data="M15.14,3C14.63,3 14.12,3.2 13.73,3.59L2.59,14.73C1.81,15.5 1.81,16.77 2.59,17.54L5.03,20C5.41,20.38 5.92,20.57 6.43,20.57C6.94,20.57 7.45,20.38 7.84,20L18.96,8.86C19.74,8.09 19.74,6.82 18.96,6.05L16.55,3.59C16.17,3.2 15.65,3 15.14,3M6.43,18.5L4,16.07L11.34,8.73L13.77,11.16L6.43,18.5Z"/>
+                </Button>
+
+                <Border Width="1" Margin="4,8" Background="#44FFFFFF"/>
+
+                <!-- 颜色选择 -->
+                <StackPanel Orientation="Horizontal" Margin="6,0" VerticalAlignment="Center">
+                    <Rectangle Width="22" Height="22" RadiusX="3" RadiusY="3"
+                               Fill="{Binding ElementName=ColorBtn, Path=Tag}"
+                               Stroke="#88FFFFFF" StrokeThickness="1"/>
+                    <TextBlock Text="颜色" Foreground="#CCFFFFFF" FontSize="11"
+                               VerticalAlignment="Center" Margin="6,0,0,0"/>
+                </StackPanel>
+                <Button x:Name="ColorBtn" Width="28" Height="40" Margin="2,0"
+                        Click="Color_Click" ToolTip="选择颜色" Tag="#FFFF2C2C">
+                    <Path Width="14" Height="14" Stretch="Uniform" Fill="White"
+                          Data="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+                </Button>
+
+                <Border Width="1" Margin="4,8" Background="#44FFFFFF"/>
+
+                <!-- 线宽 -->
+                <TextBlock Text="线宽" Foreground="#CCFFFFFF" FontSize="11"
+                           VerticalAlignment="Center" Margin="6,0,4,0"/>
+                <Slider x:Name="WidthSlider" Width="80" Minimum="1" Maximum="20" Value="3"
+                        VerticalAlignment="Center" ValueChanged="Width_Changed"
+                        ToolTip="线宽"/>
+
+                <Border Width="1" Margin="4,8" Background="#44FFFFFF"/>
+
+                <!-- 撤销 -->
+                <Button Width="40" Height="40" Margin="2,0"
+                        Click="Undo_Click" ToolTip="撤销">
+                    <Path Width="18" Height="18" Stretch="Uniform" Fill="White"
+                          Data="M12.5,8C9.85,8 7.45,9 5.6,10.6L2,7V16H11L7.38,12.38C8.77,11.22 10.54,10.5 12.5,10.5C16.04,10.5 19.05,12.81 20.1,16L22.47,15.22C21.08,11.03 17.15,8 12.5,8Z"/>
+                </Button>
+
+                <!-- 清除 -->
+                <Button Width="40" Height="40" Margin="2,0"
+                        Click="Clear_Click" ToolTip="清除全部">
+                    <Path Width="18" Height="18" Stretch="Uniform" Fill="#ff5252"
+                          Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                </Button>
+
+                <Border Width="1" Margin="4,8" Background="#44FFFFFF"/>
+
+                <!-- 退出标注 -->
+                <Button Width="40" Height="40" Margin="2,0"
+                        Click="Exit_Click" ToolTip="退出标注">
+                    <Path Width="18" Height="18" Stretch="Uniform" Fill="White"
+                          Data="M18,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V4A2,2 0 0,0 18,2M14.5,16.5L13.09,17.91L9.59,14.41L6.09,17.91L4.67,16.5L8.17,13L4.67,9.5L6.09,8.09L9.59,11.59L13.09,8.09L14.5,9.5L11,13L14.5,16.5Z"/>
+                </Button>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
