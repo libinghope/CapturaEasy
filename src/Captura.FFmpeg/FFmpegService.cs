@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
@@ -9,61 +9,17 @@ namespace Captura.FFmpeg
     {
         const string FFmpegExeName = "ffmpeg.exe";
 
-        static FFmpegSettings GetSettings() => ServiceProvider.Get<FFmpegSettings>();
-
-        public static bool FFmpegExists
-        {
-            get
-            {
-                var folderPath = GetSettings().GetFolderPath();
-
-                // FFmpeg folder
-                if (!string.IsNullOrWhiteSpace(folderPath))
-                {
-                    var path = Path.Combine(folderPath, FFmpegExeName);
-
-                    if (File.Exists(path))
-                        return true;
-                }
-
-                if (ServiceProvider.FileExists(FFmpegExeName))
-                    return true;
-
-                // PATH
-                try
-                {
-                    Process.Start(new ProcessStartInfo
-                    {
-                        FileName = FFmpegExeName,
-                        Arguments = "-version",
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    });
-
-                    return true;
-                }
-                catch { return false; }
-            }
-        }
+        public static bool FFmpegExists => File.Exists(FFmpegExePath);
 
         public static string FFmpegExePath
         {
             get
             {
-                var folderPath = GetSettings().GetFolderPath();
-
-                // FFmpeg folder
-                if (!string.IsNullOrWhiteSpace(folderPath))
-                {
-                    var path = Path.Combine(folderPath, FFmpegExeName);
-
-                    if (File.Exists(path))
-                        return path;
-                }
-
+                // 内置 FFmpeg：优先查找 Codecs 子目录（构建时由 Captura.csproj 复制）
                 return new[] { ServiceProvider.AppDir, ServiceProvider.LibDir }
                            .Where(M => M != null)
-                           .FirstOrDefault(M => File.Exists(Path.Combine(M, FFmpegExeName)))
+                           .Select(M => Path.Combine(M, "Codecs", FFmpegExeName))
+                           .FirstOrDefault(File.Exists)
                        ?? FFmpegExeName;
             }
         }
@@ -83,18 +39,18 @@ namespace Captura.FFmpeg
                 },
                 EnableRaisingEvents = true
             };
-            
+
             var log = ServiceProvider.Get<IFFmpegLogRepository>();
 
             var logItem = log.CreateNew(Path.GetFileName(FileName), Arguments);
             FFmpegLog = logItem;
-                        
+
             process.ErrorDataReceived += (S, E) => logItem.Write(E.Data);
 
             process.Start();
 
             process.BeginErrorReadLine();
-            
+
             return process;
         }
 

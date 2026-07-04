@@ -1,9 +1,7 @@
 using Captura.Audio;
 using System;
-using Captura.Video;
 using Captura.Webcam;
 using Captura.Windows.Gdi;
-using Captura.Windows.MediaFoundation;
 
 namespace Captura.Windows
 {
@@ -11,32 +9,15 @@ namespace Captura.Windows
     {
         public static void Load(IBinder Binder)
         {
-            if (Windows8OrAbove)
-            {
-                MfManager.Startup();
-                Binder.BindAsInterfaceAndClass<IVideoWriterProvider, MfWriterProvider>();
-            }
-
             Binder.BindSingleton<WindowsSettings>();
             Binder.Bind<IPlatformServices, WindowsPlatformServices>();
             Binder.Bind<IDialogService, DialogService>();
             Binder.Bind<IClipboardService, ClipboardService>();
             Binder.Bind<IImagingSystem, DrawingImagingSystem>();
             Binder.Bind<IWebCamProvider, WebcamProvider>();
-
-            foreach (var audioItem in MfAudioItem.Items)
-            {
-                Binder.Bind<IAudioWriterItem>(() => audioItem);
-            }
         }
 
-        public static void Unload()
-        {
-            if (Windows8OrAbove)
-            {
-                MfManager.Shutdown();
-            }
-        }
+        public static void Unload() { }
 
         public static bool Windows8OrAbove
         {

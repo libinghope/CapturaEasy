@@ -8,10 +8,11 @@
             <Setter Property="Command" Value="GoToPage"/>
         </Style>
         <Style x:Key="GroupTitle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Margin" Value="2,0,0,4"/>
-            <Setter Property="Foreground" Value="{DynamicResource ItemText}"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="{StaticResource BrandFont}"/>
+            <Setter Property="Margin" Value="2,0,0,6"/>
+            <Setter Property="Foreground" Value="#5D4037"/>
         </Style>
         <Style x:Key="GroupWrap" TargetType="WrapPanel">
             <Setter Property="Margin" Value="0,0,0,14"/>
@@ -67,10 +68,6 @@
                 <!-- ============ 高级 ============ -->
                 <TextBlock Text="高级" Style="{StaticResource GroupTitle}"/>
                 <WrapPanel Style="{StaticResource GroupWrap}">
-                    <captura:ModernButton Content="FFmpeg"
-                                          IconData="{Binding Icons.VideoFile, Source={StaticResource ServiceLocator}}"
-                                          CommandParameter="/Pages/FFmpegPage.xaml"/>
-
                     <captura:ModernButton Content="{Binding Proxy, Source={StaticResource Loc}, Mode=OneWay}"
                                           IconData="{Binding Icons.Web, Source={StaticResource ServiceLocator}}"
                                           CommandParameter="/Pages/ProxyPage.xaml"/>

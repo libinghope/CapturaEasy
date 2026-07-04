@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -375,7 +375,8 @@ namespace Captura.ViewModels
 
         void SeparateFileForEveryAudioSource(RecordingModelParams RecordingParams)
         {
-            var audioWriter = new WaveItem();
+            // 使用第一个可用的音频写入器（FFmpeg 提供 aac/mp3/ogg/opus）
+            var audioWriter = ServiceProvider.Get<IEnumerable<IAudioWriterItem>>().First();
 
             IRecorder GetAudioRecorder(IAudioProvider AudioProvider, string AudioFileName = null)
             {
@@ -386,7 +387,7 @@ namespace Captura.ViewModels
 
             string GetAudioFileName(int Index)
             {
-                return Path.ChangeExtension(CurrentFileName, $".{Index}.wav");
+                return Path.ChangeExtension(CurrentFileName, $".{Index}{audioWriter.Extension}");
             }
 
             var audioProviders = new[]

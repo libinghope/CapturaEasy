@@ -1,4 +1,4 @@
-﻿using SharpDX;
+using System.Drawing;
 
 namespace Captura.Windows.DesktopDuplication
 {

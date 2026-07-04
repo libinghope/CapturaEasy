@@ -9,7 +9,6 @@ namespace Captura.FFmpeg
         {
             Binder.BindSingleton<FFmpegSettings>();
             Binder.BindAsInterfaceAndClass<IVideoWriterProvider, FFmpegWriterProvider>();
-            Binder.BindAsInterfaceAndClass<IVideoWriterProvider, StreamingWriterProvider>();
 
             foreach (var audioItem in FFmpegAudioItem.Items)
             {

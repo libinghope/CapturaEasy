@@ -5,7 +5,6 @@ using Captura.Hotkeys;
 using Captura.Imgur;
 using Captura.Loc;
 using Captura.MouseKeyHook;
-using Captura.SharpAvi;
 using Captura.Video;
 using Captura.ViewModels;
 using Captura.Webcam;
@@ -18,8 +17,6 @@ namespace Captura
     {
         public void OnLoad(IBinder Binder)
         {
-            Binder.Bind<IAudioWriterItem, WaveItem>();
-
             WindowsModule.Load(Binder);
 
             FFmpegModule.Load(Binder);
@@ -103,7 +100,6 @@ namespace Captura
 
         static void BindVideoWriterProviders(IBinder Binder)
         {
-            Binder.BindAsInterfaceAndClass<IVideoWriterProvider, SharpAviWriterProvider>();
             Binder.BindAsInterfaceAndClass<IVideoWriterProvider, DiscardWriterProvider>();
         }
 

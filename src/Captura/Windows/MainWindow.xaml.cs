@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Media;
 using Captura.Bootstrap;
 using Captura.Models;
 using Captura.Prototype;
@@ -155,7 +156,7 @@ namespace Captura
 
         // ============ 顶栏 / 窗口控制 ============
 
-        // 顶栏空白区拖拽窗口
+        // 顶栏空白区拖拽窗口（冒泡事件：按钮会自行吞掉 MouseLeftButtonDown，DragMove 只在空白区触发）
         void TopBar_PreviewMouseLeftButtonDown(object Sender, MouseButtonEventArgs Args)
         {
             if (Args.ButtonState == MouseButtonState.Pressed)

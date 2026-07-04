@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Drawing;
 using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;

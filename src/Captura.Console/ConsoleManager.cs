@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,7 +9,6 @@ using System.Windows.Forms;
 using Captura.Audio;
 using Captura.FFmpeg;
 using Captura.Models;
-using Captura.SharpAvi;
 using Captura.Video;
 using Captura.ViewModels;
 using Captura.Webcam;
@@ -74,9 +73,6 @@ namespace Captura
 
             // Output Folder
             _settings.OutPath = dummySettings.OutPath;
-
-            // FFmpeg Path
-            _settings.FFmpeg.FolderPath = dummySettings.FFmpeg.FolderPath;
 
             foreach (var overlay in dummySettings.Censored)
             {
@@ -247,15 +243,13 @@ namespace Captura
                 return selected.writer;
             }
 
-            var sharpAviWriterProvider = ServiceProvider.Get<SharpAviWriterProvider>();
-
             // Steps in video
             if (StartOptions.Encoder == "steps:video")
             {
                 _settings.Video.RecorderMode = RecorderMode.Steps;
 
                 VideoWriterKind = null;
-                return new StepsVideoWriterItem(sharpAviWriterProvider.First());
+                return new StepsVideoWriterItem(ServiceProvider.Get<FFmpegWriterProvider>().First());
             }
 
             // Steps in set of images
@@ -267,8 +261,9 @@ namespace Captura
                 return new ImageFolderWriterItem();
             }
 
-            VideoWriterKind = sharpAviWriterProvider;
-            return sharpAviWriterProvider.First();
+            var ffmpegProvider = ServiceProvider.Get<FFmpegWriterProvider>();
+            VideoWriterKind = ffmpegProvider;
+            return ffmpegProvider.First();
         }
 
         void HandleWebcam(StartCmdOptions StartOptions)

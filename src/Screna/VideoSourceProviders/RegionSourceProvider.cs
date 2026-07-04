@@ -85,8 +85,8 @@ namespace Captura.Video
 
             _regionProvider.SelectedRegion = rect;
 
-            _regionProvider.SelectorVisible = true;
-
+            // 启动恢复时不再自动弹出区域选择框（避免视觉污染）。
+            // 区域坐标已恢复，用户主动选"区域"源时由 OnSelect 弹出选择器确认。
             return true;
         }
 

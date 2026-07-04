@@ -1,15 +1,15 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Captura.Windows.MediaFoundation;
 using Captura.Native;
+using Captura.Video;
 using SharpDX.Direct3D11;
 using Device = SharpDX.Direct3D11.Device;
 using MapFlags = SharpDX.Direct3D11.MapFlags;
 
 namespace Captura.Windows.DirectX
 {
-    public class Texture2DFrame : INV12Frame
+    public class Texture2DFrame : IBitmapFrame
     {
         public Texture2D Texture { get; }
         public Texture2D PreviewTexture { get; }
@@ -18,15 +18,11 @@ namespace Captura.Windows.DirectX
 
         public TimeSpan Timestamp { get; }
 
-        readonly Lazy<MfColorConverter> _colorConverter;
-
         public Texture2DFrame(Texture2D Texture,
             Device Device,
             Texture2D PreviewTexture,
-            TimeSpan Timestamp,
-            Lazy<MfColorConverter> ColorConverter)
+            TimeSpan Timestamp)
         {
-            _colorConverter = ColorConverter;
             this.Timestamp = Timestamp;
             this.Texture = Texture;
             this.Device = Device;
@@ -90,11 +86,6 @@ namespace Captura.Windows.DirectX
             {
                 Device.ImmediateContext.UnmapSubresource(Texture, 0);
             }
-        }
-
-        public void CopyNV12To(byte[] Buffer)
-        {
-            _colorConverter.Value.Convert(Texture, Buffer);
         }
     }
 }

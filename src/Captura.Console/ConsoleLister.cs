@@ -1,7 +1,6 @@
-﻿using Captura.Audio;
+using Captura.Audio;
 using System.Linq;
 using Captura.FFmpeg;
-using Captura.SharpAvi;
 using Captura.Webcam;
 using static System.Console;
 
@@ -16,26 +15,21 @@ namespace Captura
         readonly IAudioSource _audioSource;
         readonly IPlatformServices _platformServices;
         readonly FFmpegWriterProvider _ffmpegWriterProvider;
-        readonly SharpAviWriterProvider _sharpAviWriterProvider;
 
         public ConsoleLister(WebcamModel Webcam,
             IAudioSource AudioSource,
             IPlatformServices PlatformServices,
-            FFmpegWriterProvider FfmpegWriterProvider,
-            SharpAviWriterProvider SharpAviWriterProvider)
+            FFmpegWriterProvider FfmpegWriterProvider)
         {
             _webcam = Webcam;
             _audioSource = AudioSource;
             _platformServices = PlatformServices;
             _ffmpegWriterProvider = FfmpegWriterProvider;
-            _sharpAviWriterProvider = SharpAviWriterProvider;
         }
 
         public void List()
         {
             FFmpeg();
-
-            SharpAvi();
 
             Windows();
 
@@ -127,30 +121,6 @@ namespace Captura
             foreach (var source in _platformServices.EnumerateWindows())
             {
                 WriteLine($"{source.Handle.ToString().PadRight(10)}: {source.Title}");
-            }
-
-            WriteLine();
-        }
-
-        void SharpAvi()
-        {
-            var sharpAviExists = ServiceProvider.FileExists("SharpAvi.dll");
-
-            WriteLine($"SharpAvi Available: {(sharpAviExists ? "YES" : "NO")}");
-
-            WriteLine();
-
-            if (!sharpAviExists)
-                return;
-
-            WriteLine("SharpAvi ENCODERS" + Underline);
-
-            var i = 0;
-
-            foreach (var codec in _sharpAviWriterProvider)
-            {
-                WriteLine($"{i.ToString().PadRight(2)}: {codec}");
-                ++i;
             }
 
             WriteLine();

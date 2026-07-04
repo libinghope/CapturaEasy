@@ -2,46 +2,63 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <!--
-        CapturaBridge.xaml — 暗色版
-        将 ModernUI 时代散布在 ~20 个 XAML 中的资源键名重定义为暗色调色板。
-        现有 XAML 引用 DynamicResource ItemText / Accent / WindowBackground 等无需修改。
-        这些值通过 MaterialDesign 主题切换在代码后置（ThemeService）中整体替换。
+        CapturaBridge.xaml — 亮色（白色）默认 + 微信绿强调色（国产软件扁平风）
+        将 ModernUI 时代散布在 ~20 个 XAML 中的资源键名重定义为亮色调色板。
+        ThemeService.ApplyTheme 会在运行时整体替换为暗色值。
     -->
 
-    <!-- 窗口/面板背景：Material Grey 900 (#212121) -->
-    <Color x:Key="WindowBackgroundColor" A="255" R="33" G="33" B="33"/>
-    <SolidColorBrush x:Key="WindowBackground" Color="#FF212121"/>
-    <SolidColorBrush x:Key="WindowBackgroundAlt" Color="#FF303030"/>
+    <!-- 标题样式：原 ModernUI 提供的 'Title'，默认用宋体（中式韵味） -->
+    <Style x:Key="Title" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="20"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontFamily" Value="{StaticResource BrandFont}"/>
+        <Setter Property="Foreground" Value="{DynamicResource WindowText}"/>
+        <Setter Property="Margin" Value="0,0,0,10"/>
+    </Style>
 
-    <!-- 窗口文字：白色 87% 不透明 -->
-    <SolidColorBrush x:Key="WindowText" Color="#DEFFFFFF"/>
-    <SolidColorBrush x:Key="WindowTextSecondary" Color="#99FFFFFF"/>
+    <!-- 分组标题样式：宋体 + 茶褐色 -->
+    <Style x:Key="GroupTitle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontFamily" Value="{StaticResource BrandFont}"/>
+        <Setter Property="Foreground" Value="#5D4037"/>
+        <Setter Property="Margin" Value="0,0,0,8"/>
+    </Style>
 
-    <!-- 列表项/卡片背景：Material Grey 800 (#424242) -->
-    <SolidColorBrush x:Key="ItemBackground" Color="#FF424242"/>
-    <SolidColorBrush x:Key="ItemBackgroundAlt" Color="#FF424242"/>
-    <SolidColorBrush x:Key="ItemBorder" Color="#FF555555"/>
-    <SolidColorBrush x:Key="ItemText" Color="#DEFFFFFF"/>
+    <!-- 窗口/面板背景：白色 (#FFFFFF) -->
+    <Color x:Key="WindowBackgroundColor" A="255" R="255" G="255" B="255"/>
+    <SolidColorBrush x:Key="WindowBackground" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="WindowBackgroundAlt" Color="#FFF5F5F5"/>
 
-    <!-- 强调色：Material Deep Purple 500 (#6200EA) -->
-    <Color x:Key="AccentColor" A="255" R="98" G="0" B="234"/>
-    <SolidColorBrush x:Key="Accent" Color="#FF6200EA"/>
-    <SolidColorBrush x:Key="AccentAlt" Color="#FF3700B3"/>
+    <!-- 窗口文字：深色 87% 不透明 -->
+    <SolidColorBrush x:Key="WindowText" Color="#DE212121"/>
+    <SolidColorBrush x:Key="WindowTextSecondary" Color="#99757575"/>
+
+    <!-- 列表项/卡片背景：浅灰 (#FAFAFA) -->
+    <SolidColorBrush x:Key="ItemBackground" Color="#FFFAFAFA"/>
+    <SolidColorBrush x:Key="ItemBackgroundAlt" Color="#FFE0E0E0"/>
+    <SolidColorBrush x:Key="ItemBorder" Color="#FFE0E0E0"/>
+    <SolidColorBrush x:Key="ItemText" Color="#DE212121"/>
+
+    <!-- 强调色：微信绿 #07C160（国产软件扁平风标志色） -->
+    <Color x:Key="AccentColor" A="255" R="7" G="193" B="96"/>
+    <SolidColorBrush x:Key="Accent" Color="#FF07C160"/>
+    <SolidColorBrush x:Key="AccentAlt" Color="#FF049244"/>
 
     <!-- 按钮三态 -->
-    <SolidColorBrush x:Key="ModernButtonText" Color="#DEFFFFFF"/>
-    <SolidColorBrush x:Key="ModernButtonTextHover" Color="#FFFFFFFF"/>
-    <SolidColorBrush x:Key="ModernButtonTextDisabled" Color="#61FFFFFF"/>
-    <SolidColorBrush x:Key="ModernButtonBorder" Color="#FF555555"/>
-    <SolidColorBrush x:Key="ButtonBackgroundHover" Color="#FF505050"/>
-    <SolidColorBrush x:Key="ButtonText" Color="#DEFFFFFF"/>
-    <SolidColorBrush x:Key="ButtonTextDisabled" Color="#61FFFFFF"/>
+    <SolidColorBrush x:Key="ModernButtonText" Color="#DE212121"/>
+    <SolidColorBrush x:Key="ModernButtonTextHover" Color="#FF000000"/>
+    <SolidColorBrush x:Key="ModernButtonTextDisabled" Color="#61757575"/>
+    <SolidColorBrush x:Key="ModernButtonBorder" Color="#FFBDBDBD"/>
+    <SolidColorBrush x:Key="ButtonBackgroundHover" Color="#FFF5F5F5"/>
+    <SolidColorBrush x:Key="ButtonText" Color="#DE212121"/>
+    <SolidColorBrush x:Key="ButtonTextDisabled" Color="#61757575"/>
 
     <!-- 链接 -->
-    <SolidColorBrush x:Key="LinkText" Color="#FF6200EA"/>
-    <SolidColorBrush x:Key="LinkButtonText" Color="#FF6200EA"/>
+    <SolidColorBrush x:Key="LinkText" Color="#FF07C160"/>
+    <SolidColorBrush x:Key="LinkButtonText" Color="#FF07C160"/>
 
     <!-- 区域分割 -->
-    <SolidColorBrush x:Key="RegionBorder" Color="#FF555555"/>
+    <SolidColorBrush x:Key="RegionBorder" Color="#FFE0E0E0"/>
 
 </ResourceDictionary>

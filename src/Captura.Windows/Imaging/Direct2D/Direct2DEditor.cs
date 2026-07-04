@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using SharpDX;
 using SharpDX.Direct2D1;
@@ -133,8 +133,7 @@ namespace Captura.Windows.DirectX
 
             _editorSession.RenderTarget.DrawLine(Convert(Start), Convert(End), Convert(Color), Width, style);
 
-            var direction = new Vector2(End.X - Start.X, End.Y - Start.Y);
-            var theta = Math.Atan2(direction.Y, direction.X);
+            var theta = Math.Atan2(End.Y - Start.Y, End.X - Start.X);
 
             const double rotateBy = 3 * Math.PI / 4;
             var sideLen = Width * 2;
@@ -221,8 +220,7 @@ namespace Captura.Windows.DirectX
             return new Texture2DFrame(_editorSession.StagingTexture,
                 _editorSession.Device,
                 _editorSession.PreviewTexture,
-                Timestamp,
-                _editorSession.ColorConverter);
+                Timestamp);
         }
     }
 }

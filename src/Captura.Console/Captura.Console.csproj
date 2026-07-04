@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <RootNamespace>Captura</RootNamespace>
@@ -26,7 +26,6 @@
     <ProjectReference Include="..\Captura.FFmpeg\Captura.FFmpeg.csproj" />
     <ProjectReference Include="..\Captura.Loc\Captura.Loc.csproj" />
     <ProjectReference Include="..\Captura.MouseKeyHook\Captura.MouseKeyHook.csproj" />
-    <ProjectReference Include="..\Captura.SharpAvi\Captura.SharpAvi.csproj" />
     <ProjectReference Include="..\Screna\Screna.csproj" />
   </ItemGroup>
   <ItemGroup>

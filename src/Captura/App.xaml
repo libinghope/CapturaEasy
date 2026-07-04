@@ -10,13 +10,13 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- MaterialDesign 主题：暗色基础 + 默认控件样式（MD3） -->
-                <materialDesign:BundledTheme BaseTheme="Dark"
-                                             PrimaryColor="DeepPurple"
-                                             SecondaryColor="Lime" />
+                <!-- MaterialDesign 主题：亮色基础 + 微信绿主色（国产软件扁平风） + 默认控件样式（MD3） -->
+                <materialDesign:BundledTheme BaseTheme="Light"
+                                             PrimaryColor="Green"
+                                             SecondaryColor="Teal" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
 
-                <!-- Captura 键名桥接：将旧 ModernUI 键名映射到暗色值，免改 20 个 XAML -->
+                <!-- Captura 键名桥接：将旧 ModernUI 键名映射到亮色值，免改 20 个 XAML -->
                 <ResourceDictionary Source="Presentation/Themes/CapturaBridge.xaml" />
 
                 <ResourceDictionary Source="Presentation/Themes/ModernButton.xaml" />
@@ -34,6 +34,19 @@
                       Member="loc:LanguageManager.Instance"/>
 
             <captura:ServiceLocator x:Key="ServiceLocator"/>
+
+            <!-- 全局默认字体：微软雅黑 UI（UI 可读性最佳，Windows 自带） -->
+            <FontFamily x:Key="UiFont">Microsoft YaHei UI</FontFamily>
+            <!-- 品牌标题字体：宋体（中式韵味） -->
+            <FontFamily x:Key="BrandFont">SimSun</FontFamily>
+
+            <!-- 默认控件字体（Window/Page/TextBlock 会继承） -->
+            <Style TargetType="Control">
+                <Setter Property="FontFamily" Value="{StaticResource UiFont}"/>
+            </Style>
+            <Style TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource UiFont}"/>
+            </Style>
 
             <DrawingImage x:Key="RecordStopImageSource">
                 <DrawingImage.Drawing>

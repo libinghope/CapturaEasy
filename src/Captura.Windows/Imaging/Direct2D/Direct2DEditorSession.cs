@@ -1,5 +1,4 @@
-﻿using System;
-using Captura.Windows.MediaFoundation;
+using System;
 using Captura.Video;
 using SharpDX.Direct2D1;
 using SharpDX.Direct3D;
@@ -33,8 +32,6 @@ namespace Captura.Windows.DirectX
         public Factory WriteFactory => _writeFactory ??= new Factory();
 
         public ImagingFactory ImagingFactory => _imagingFactory ??= new ImagingFactory();
-
-        public Lazy<MfColorConverter> ColorConverter { get; }
 
         public SolidColorBrush GetSolidColorBrush(RawColor4 Color)
         {
@@ -97,8 +94,6 @@ namespace Captura.Windows.DirectX
             {
                 RenderTarget = new RenderTarget(_factory, surface, renderTargetProps);
             }
-
-            ColorConverter = new Lazy<MfColorConverter>(() => new MfColorConverter(Width, Height, Device));
         }
 
         public Texture2D CreateGdiTexture(int Width, int Height)
@@ -140,11 +135,6 @@ namespace Captura.Windows.DirectX
 
         public void Dispose()
         {
-            if (ColorConverter.IsValueCreated)
-            {
-                ColorConverter.Value.Dispose();
-            }
-
             _solidColorBrush?.Dispose();
             _solidColorBrush = null;
 

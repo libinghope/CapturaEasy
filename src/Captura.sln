@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28729.10
@@ -14,8 +14,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{AF998FD2-10BB-4CB2-802C-B44879776544}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Captura.Base", "Captura.Base\Captura.Base.csproj", "{388D8B28-E629-4684-8537-8D78719B69E5}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Captura.SharpAvi", "Captura.SharpAvi\Captura.SharpAvi.csproj", "{BB8FF9F8-EC60-4A4A-A3F0-D9FBFB585D86}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Captura.MouseKeyHook", "Captura.MouseKeyHook\Captura.MouseKeyHook.csproj", "{6CC6E9C8-9A94-4FB0-8396-47E2ECBD8300}"
 EndProject
@@ -71,10 +69,6 @@ Global
 		{388D8B28-E629-4684-8537-8D78719B69E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{388D8B28-E629-4684-8537-8D78719B69E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{388D8B28-E629-4684-8537-8D78719B69E5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BB8FF9F8-EC60-4A4A-A3F0-D9FBFB585D86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BB8FF9F8-EC60-4A4A-A3F0-D9FBFB585D86}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BB8FF9F8-EC60-4A4A-A3F0-D9FBFB585D86}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BB8FF9F8-EC60-4A4A-A3F0-D9FBFB585D86}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6CC6E9C8-9A94-4FB0-8396-47E2ECBD8300}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6CC6E9C8-9A94-4FB0-8396-47E2ECBD8300}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6CC6E9C8-9A94-4FB0-8396-47E2ECBD8300}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -130,10 +130,10 @@ namespace Captura
                 Settings.Load();
             }
 
-            // 默认已是暗色（App.xaml 的 BundledTheme BaseTheme="Dark"）
-            if (!Settings.UI.DarkTheme)
+            // 默认已是亮色（App.xaml 的 BundledTheme BaseTheme="Light"）
+            if (Settings.UI.DarkTheme)
             {
-                ThemeService.ApplyTheme(false);
+                ThemeService.ApplyTheme(true);
             }
 
             var accent = Settings.UI.AccentColor;

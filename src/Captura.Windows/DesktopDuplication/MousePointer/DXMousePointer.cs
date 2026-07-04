@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using Captura.Windows.DirectX;
-using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using Rectangle = System.Drawing.Rectangle;
+using Point = System.Drawing.Point;
 
 namespace Captura.Windows.DesktopDuplication
 {

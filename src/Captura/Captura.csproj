@@ -28,7 +28,6 @@
     <ProjectReference Include="..\Captura.Hotkeys\Captura.Hotkeys.csproj" />
     <ProjectReference Include="..\Captura.Loc\Captura.Loc.csproj" />
     <ProjectReference Include="..\Captura.MouseKeyHook\Captura.MouseKeyHook.csproj" />
-    <ProjectReference Include="..\Captura.SharpAvi\Captura.SharpAvi.csproj" />
     <ProjectReference Include="..\Captura.ViewCore\Captura.ViewCore.csproj" />
     <ProjectReference Include="..\Captura.Windows\Captura.Windows.csproj" />
     <ProjectReference Include="..\Captura.YouTube\Captura.YouTube.csproj" />
@@ -42,10 +41,8 @@
     <PackageReference Include="ModernUI.WPF" Version="1.0.9" />
     <PackageReference Include="SamOatesGames.ModernUI.Xceed.Toolkit" Version="1.0.0" />
   </ItemGroup>
-  <!-- 自动复制 FFmpeg（shared 构建：ffmpeg.exe + av*.dll）到输出目录的 Codecs 子目录。
-       Captura 运行时按 AppDir\Codecs 约定查找（见 FFMpegSettings.GetFolderPath）。
-       源文件位于解决方案根的 lib\ffmpeg\，不入版本库（见 .gitignore）；
-       团队/CI 需自行下载 ffmpeg shared 构建并解压到 lib\ffmpeg\。-->
+  <!-- FFmpeg 内置：将 lib\ffmpeg\（shared 构建：ffmpeg.exe + av*.dll）复制到输出目录的 Codecs 子目录。
+       运行时 FFmpegService.FFmpegExePath 按 AppDir\Codecs\ffmpeg.exe 查找。 -->
   <Target Name="CopyFFmpeg" BeforeTargets="Build" Condition="Exists('$(MSBuildThisFileDirectory)..\..\lib\ffmpeg\ffmpeg.exe')">
     <ItemGroup>
       <FFmpegFiles Include="$(MSBuildThisFileDirectory)..\..\lib\ffmpeg\**\*.*" />

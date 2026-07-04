@@ -189,7 +189,7 @@
         <!-- ============ 顶栏：状态区 + 窗口控制 ============ -->
         <Grid Grid.Row="0" Height="40"
               Background="{DynamicResource ButtonBackgroundHover}"
-              PreviewMouseLeftButtonDown="TopBar_PreviewMouseLeftButtonDown">
+              MouseLeftButtonDown="TopBar_PreviewMouseLeftButtonDown">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition/>
@@ -223,7 +223,8 @@
                         </Style>
                     </Ellipse.Style>
                 </Ellipse>
-                <TextBlock VerticalAlignment="Center" FontWeight="SemiBold">
+                <TextBlock VerticalAlignment="Center" FontWeight="SemiBold"
+                           FontFamily="{StaticResource BrandFont}" FontSize="15">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Text" Value="CapturaEasy"/>

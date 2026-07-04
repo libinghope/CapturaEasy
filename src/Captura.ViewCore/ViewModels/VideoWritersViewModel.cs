@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System;
-using Captura.SharpAvi;
 using Captura.Video;
 
 namespace Captura.ViewModels
@@ -17,8 +16,7 @@ namespace Captura.ViewModels
         public IEnumerable<IVideoConverter> AvailablePostWriters { get; }
 
         public VideoWritersViewModel(IEnumerable<IVideoWriterProvider> WriterProviders,
-            IEnumerable<IVideoConverter> PostWriters,
-            SharpAviWriterProvider SharpAviWriterProvider)
+            IEnumerable<IVideoConverter> PostWriters)
         {
             VideoWriterProviders = WriterProviders.ToList();
 
@@ -32,7 +30,7 @@ namespace Captura.ViewModels
 
             AvailableStepWriters = new IVideoWriterItem[]
             {
-                new StepsVideoWriterItem(SharpAviWriterProvider.First()),
+                new StepsVideoWriterItem(VideoWriterProviders[0].First()),
                 new ImageFolderWriterItem()
             };
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Captura.FFmpeg;
 
 namespace Captura.Fakes
@@ -12,15 +12,7 @@ namespace Captura.Fakes
 
         public void ShowUnavailable()
         {
-            Console.Error.WriteLine("FFmpeg is not available.\nYou can install ffmpeg by calling: captura ffmpeg --install [path]");
-        }
-
-        public void ShowDownloader()
-        {
-        }
-
-        public void PickFolder()
-        {
+            Console.Error.WriteLine("FFmpeg is not available.");
         }
     }
 }

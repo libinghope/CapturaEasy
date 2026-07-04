@@ -1,4 +1,4 @@
-﻿namespace Captura
+namespace Captura
 {
     public class VisualSettings : PropertyStore
     {
@@ -16,7 +16,7 @@
 
         public string AccentColor
         {
-            get => Get<string>();
+            get => Get("#07C160");
             set => Set(value);
         }
 

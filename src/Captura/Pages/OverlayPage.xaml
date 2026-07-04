@@ -1,10 +1,9 @@
-﻿<Page x:Class="Captura.OverlayPage"
+<Page x:Class="Captura.OverlayPage"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Captura"
-        xmlns:mui="http://firstfloorsoftware.com/ModernUI"
         mc:Ignorable="d"
         Title="{Binding Overlays, Source={StaticResource Loc}, Mode=OneWay}"
         SizeChanged="OverlayWindow_OnSizeChanged">
@@ -19,7 +18,7 @@
                     BorderThickness="0">
             <TabControl.ContentTemplate>
                 <DataTemplate>
-                    <mui:TransitioningContentControl Content="{Binding}"/>
+                    <ContentControl Content="{Binding}"/>
                 </DataTemplate>
             </TabControl.ContentTemplate>
             <TabItem Header="{Binding Keystrokes, Source={StaticResource Loc}, Mode=OneWay}">
